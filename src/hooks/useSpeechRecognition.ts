@@ -119,6 +119,8 @@ export function useSpeechRecognition() {
         isSupported,
         start,
         stop,
+        startListening: start,
+        stopListening: stop,
         resetTranscript,
     };
 }

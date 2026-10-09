@@ -1,28 +1,42 @@
 // lib/utils/praise.ts
 
 const praises = [
-    'Harikasın! Süper söyledin! 🌟',
-    'Çok güzel! Aferin sana! 👏',
-    'Tebrikler! Harika bir telaffuz! 🎉',
-    'Muhteşemsin! Tam bir şampiyon! 🏆',
-    'Harika iş çıkardın! Çok iyiydi! 🚀',
-    'Süpersin! Çok net ve doğru! ⭐',
+    'Süpersin! 🌟',
+    'Harikasın! 🎉',
+    'Çok güzel söyledin! 👏',
+    'Mükemmel! 🏆',
+    'Bravo, şampiyon! 🥇',
+    'Aferin sana! ⭐',
+    'Çok iyiydi! 🚀',
+    'Tam isabet! 🎯',
+    'Muhteşemsin! 🌈',
+    'Harika iş! ✨',
 ];
 
 const encouragements = [
-    'Çok yaklaştın, bir kez daha dene! ✨',
-    'Biraz daha gayret, başarabilirsin! 💪',
-    'Tekrar deneyelim, haydi bir daha söyle! 🎯',
-    'Neredeyse oldu! Bir kez daha dene! 🎈',
-    'Harika çabalıyorsun, haydi bir daha! 🌈',
+    'Neredeyse oldu! Bir kez daha dene! 💪',
+    'Çok yaklaştın, hadi yeniden! 🎯',
+    'Biraz daha, başarabilirsin! ✨',
+    'Devam et, pes etme! 🌟',
+    'Bu sefer daha dikkatli dene! 👂',
+    'Güzel çaba! Bir kez daha söyle! 🎤',
+];
+
+const motivations = [
+    'Bugün çok iyi çalışıyorsun! 🌟',
+    'Her seferinde daha iyileşiyorsun! 📈',
+    'Harika bir ilerleme! 🚀',
+    'Devam et, gerçek bir kahraman oluyorsun! 🦸',
 ];
 
 export function randomPraise(): string {
-    const index = Math.floor(Math.random() * praises.length);
-    return praises[index];
+    return praises[Math.floor(Math.random() * praises.length)];
 }
 
 export function randomEncouragement(): string {
-    const index = Math.floor(Math.random() * encouragements.length);
-    return encouragements[index];
+    return encouragements[Math.floor(Math.random() * encouragements.length)];
+}
+
+export function randomMotivation(): string {
+    return motivations[Math.floor(Math.random() * motivations.length)];
 }
