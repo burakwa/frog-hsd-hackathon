@@ -1,36 +1,217 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🐸 FrogFriends — Çocuklar için Konuşma Öğrenme Platformu
 
-## Getting Started
+> **Canlı Demo:** [https://frog-hsd-hackathon.vercel.app](https://frog-hsd-hackathon.vercel.app)
 
-First, run the development server:
+Eğlenceli bir kurbağa karakteriyle, çocukların konuşmayı öğrenmesini ve telaffuzlarını geliştirmesini sağlayan etkileşimli bir web platformu. Duolingo tarzı ilerleme sistemi, ses tanıma teknolojisi ve AI destekli analizlerle çocuklar oyun oynarken konuşur.
+
+---
+
+## ✨ Özellikler
+
+### 🎮 4 Farklı Oyun Modu
+| Oyun | Açıklama | Beceri |
+|------|----------|--------|
+| **Ses Tekrarı** | Kelimeleri dinle, tekrar et ve puan kazan | Temel telaffuz |
+| **Hece Avı** | Sinekleri yakalayarak heceleri öğren | Hece farkındalığı |
+| **Cümle Kur** | Eksik kelimeleri bul, cümleleri tamamla | Dilbilgisi & sözcük hazinesi |
+| **Sesli Masal** | Masalları oku, dinle ve keyifle öğren | Akıcılık & anlama |
+
+### 🏆 Duolingo Tarzı İlerleme Sistemi
+- **Seviye atlama** — Yıldız toplayarak seviye atlayın
+- **Kilitli bölümler** — Önceki seviyeleri tamamlayarak yeni oyunları açın
+- **Günlük seriler** — Düzenli pratik için motivasyon
+- **İlerleme takibi** — Oynanan oyun, kazanılan yıldız, tamamlanan bölüm istatistikleri
+
+### 🎤 Ses Teknolojileri
+- **Web Speech API** — Tarayıcı tabanlı ses tanıma ve sentez
+- **Gerçek zamanlı geri bildirim** — Anlık telaffuz doğruluğu analizi
+- **Ses görselleştirme** — Mikrofon seviyesi ve dalga formu göstergesi
+
+### 🤖 AI Destekli Analiz (OpenRouter)
+- Konuşma performansı detaylı raporlama
+- Kişiselleştirilmiş öğrenme önerileri
+- Veli paneli için gelişim raporları
+
+### 👨‍👩‍👧‍👦 Veli Paneli
+- Çocuğun ilerlemesini izleme
+- Detaylı oturum geçmişi
+- AI destekli gelişim raporları
+
+---
+
+## 🛠 Teknoloji Yığını
+
+| Kategori | Teknolojiler |
+|----------|--------------|
+| **Frontend** | Next.js 16 (App Router), React 19, TypeScript |
+| **Styling** | Tailwind CSS v4, Framer Motion |
+| **Backend & Auth** | Supabase (PostgreSQL, Auth, Realtime) |
+| **AI** | OpenRouter API |
+| **Charts** | Recharts |
+| **Icons** | Lucide React |
+| **Animations** | Framer Motion, Canvas Confetti |
+| **Deployment** | Vercel |
+
+---
+
+## 🚀 Hızlı Başlangıç
+
+### Ön Gereksinimler
+- Node.js 20+
+- npm / pnpm / yarn
+- Supabase hesabı (ücretsiz)
+- OpenRouter API anahtarı (AI özellikleri için)
+
+### Kurulum
+
+```bash
+# Repoyu klonlayın
+git clone https://github.com/kullanici/frog.git
+cd frog
+
+# Bağımlılıkları yükleyin
+npm install
+
+# Ortam değişkenlerini kopyalayın ve düzenleyin
+cp .env.example .env.local
+```
+
+### `.env.local` Yapılandırması
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# OpenRouter (AI analiz için)
+OPENROUTER_API_KEY=your_openrouter_key
+```
+
+### Supabase Kurulumu
+
+1. [Supabase](https://supabase.com) yeni bir proje oluşturun
+2. SQL Editör'de `supabase-schema.sql` ve `supabase-ai-reports.sql` dosyalarını çalıştırın
+3. Authentication > Providers > Email'ü etkinleştirin
+
+### Geliştirme Sunucusu
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tarayıcınızda [http://localhost:3000](http://localhost:3000) adresini açın.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📁 Proje Yapısı
 
-## Learn More
+```
+src/
+├── app/                    # Next.js App Router sayfaları
+│   ├── api/               # API rotaları (analiz, AI rapor)
+│   ├── giris/             # Giriş sayfası
+│   ├── kayit/             # Kayıt sayfası
+│   ├── panel/             # Ana öğrenme paneli (korumalı)
+│   │   ├── ilerleme/      # İlerleme detayları
+│   │   ├── oyunlar/       # Oyun sayfaları
+│   │   ├── veli-paneli/   # Veli paneli
+│   │   └── profil/        # Profil sayfası
+│   ├── globals.css        # Global stiller
+│   ├── layout.tsx         # Root layout + metadata
+│   └── page.tsx           # Landing page
+├── components/
+│   └── game/              # Oyun bileşenleri (Character, vb.)
+├── hooks/                 # Custom React hooks
+│   ├── useAuth.ts         # Kimlik doğrulama
+│   ├── useProgress.ts     # İlerleme takibi
+│   ├── useSpeechRecognition.ts
+│   ├── useSpeechSynthesis.ts
+│   ├── useMicrophone.ts
+│   ├── useEnhancedSpeechAnalysis.ts
+│   └── useAIAnalysis.ts
+├── lib/
+│   ├── ai/                # OpenRouter entegrasyonu
+│   ├── comparison/        # Fonem karşılaştırma algoritmaları
+│   ├── data/              # Oyun verileri (kelimeler, masallar, cümleler)
+│   ├── exercises/         # Egzersiz mantığı
+│   ├── speech/            # Ses tanıma/sentez yardımcıları
+│   ├── supabase/          # Supabase client/server
+│   └── utils/             # Yardımcı fonksiyonlar
+├── types/                 # TypeScript tip tanımları
+└── middleware.ts          # Auth koruma middleware'i
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 Tasarım Felsefesi
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Çocuk odaklı** — Yumuşak köşeler, canlı renkler, eğlenceli animasyonlar
+- **Erişilebilirlik** — Yüksek kontrast, büyük dokunma alanları, ekran okuyucu uyumlu
+- **Güvenli** — Reklamsız, dış bağlantısız, veri gizliliği öncelikli
+- **Performanslı** — Next.js 16, Turbopack, optimize edilmiş bundle
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📸 Ekran Görüntüleri
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Ana Sayfa (Landing)
+> Renkli, animate edilmiş hero section + 4 oyun özelliği kartı
+
+### Öğrenme Paneli
+> Duolingo tarzı yol haritası, seviye halkası, kilitli/açık bölümler
+
+### Oyun Ekranları
+> Ses tekrarı, hece avı, cümle kur, sesli masal — her biri karakter animasyonlu
+
+### Veli Paneli
+> İstatistik kartları, AI raporu, oturum geçmişi
+
+---
+
+## 🔐 Güvenlik & Gizlilik
+
+- **Row Level Security (RLS)** — Supabase ile kullanıcı verileri izole
+- **HTTPS Only** — Vercel otomatik SSL
+- **Minimal Veri Toplama** — Sadece öğrenme için gerekli veriler
+- **Çocuk Güvenliği** — COPPA/GDPR-KVKK uyumlu tasarım
+
+---
+
+## 📝 Lisans
+
+MIT License — Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+
+---
+
+## 🤝 Katkıda Bulunma
+
+1. Fork yapın
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
+4. Branch'inizi pushlayın (`git push origin feature/amazing-feature`)
+5. Pull Request açın
+
+---
+
+## 🙏 Teşekkürler
+
+- **Supabase** — Backend altyapısı için
+- **Vercel** — Ücretsiz hosting ve deployment için
+- **OpenRouter** — AI model erişimi için
+- **Next.js Team** — Harika framework için
+- **Tasarım ilhamı** — Duolingo, Khan Academy Kids
+
+---
+
+## 📞 İletişim
+
+**Proje Sahibi:** [Burak](https://github.com/burak)  
+**Canlı Demo:** [https://frog-hsd-hackathon.vercel.app](https://frog-hsd-hackathon.vercel.app)  
+**Sorun Bildirimi:** [GitHub Issues](https://github.com/kullanici/frog/issues)
+
+---
+
+<div align="center">
+  <sub>Sevgi ve dikkatle yapıldı 💚</sub>
+</div>

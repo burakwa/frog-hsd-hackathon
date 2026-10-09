@@ -1,16 +1,18 @@
 // app/giris/page.tsx — Bright Login Page
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, Sparkles, User, Play } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { createClient } from '@/lib/supabase/client';
 import Character from '@/components/game/Character';
 
-export default function GirisPage() {
+function GirisPageContent() {
     const router = useRouter();
-    const { signInWithEmail } = useAuth();
+    const searchParams = useSearchParams();
+    const { signInWithEmail, setReturnUrl } = useAuth();
     const [tab, setTab] = useState<'child' | 'parent'>('child');
     const [childName, setChildName] = useState('');
     const [selectedAvatar, setSelectedAvatar] = useState<'kurbaga' | 'panda' | 'tavsan'>('kurbaga');
@@ -21,6 +23,14 @@ export default function GirisPage() {
     const [showPass, setShowPass] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // Capture redirect URL from query params
+    useEffect(() => {
+        const redirect = searchParams.get('redirect');
+        if (redirect) {
+            setReturnUrl(redirect);
+        }
+    }, [searchParams, setReturnUrl]);
 
     const handleChildSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -36,12 +46,17 @@ export default function GirisPage() {
         e.preventDefault();
         setError('');
         setLoading(true);
-        const { error: authErr } = await signInWithEmail(email, password);
+        const supabase = createClient();
+        const { error: authErr } = await supabase.auth.signInWithPassword({ email, password });
         setLoading(false);
         if (authErr) {
             setError('E-posta veya şifre hatalı. Lütfen tekrar dene!');
         } else {
-            router.push('/panel');
+            // Oturum çerezlerinin ayarlanmasını bekle
+            await new Promise(r => setTimeout(r, 300));
+            // Use stored return URL or default to panel
+            const returnUrl = (typeof window !== 'undefined') ? localStorage.getItem('frog_return_url') : null;
+            router.push(returnUrl || '/panel');
         }
     };
 
@@ -265,5 +280,13 @@ export default function GirisPage() {
                 </div>
             </motion.div>
         </main>
+    );
+}
+
+export default function GirisPage() {
+    return (
+        <Suspense fallback={<div className="page-wrapper min-h-screen flex items-center justify-center"><div className="animate-pulse text-gray-400">Yükleniyor...</div></div>}>
+            <GirisPageContent />
+        </Suspense>
     );
 }

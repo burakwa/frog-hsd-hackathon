@@ -9,7 +9,7 @@ CREATE TABLE profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
     ad TEXT NOT NULL,
     yas INTEGER,
-    avatar TEXT CHECK (avatar IN ('kurbaga', 'panda', 'tavsan')) DEFAULT 'kurbaga',
+    avatar TEXT DEFAULT 'kurbaga',
     toplam_yildiz INTEGER DEFAULT 0,
     seviye INTEGER DEFAULT 1,
     created_at TIMESTAMPTZ DEFAULT NOW(),

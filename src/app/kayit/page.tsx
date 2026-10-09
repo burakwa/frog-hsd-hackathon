@@ -1,16 +1,18 @@
 // app/kayit/page.tsx — Register Page with DiceBear Avatar
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle, Sparkles, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { createClient } from '@/lib/supabase/client';
 import Character, { AvatarPicker } from '@/components/game/Character';
 
-export default function KayitPage() {
+function KayitPageContent() {
     const router = useRouter();
-    const { signUpWithEmail } = useAuth();
+    const searchParams = useSearchParams();
+    const { signUpWithEmail, setReturnUrl } = useAuth();
     
     const [step, setStep] = useState<1 | 2>(1);
     const [form, setForm] = useState({ 
@@ -26,6 +28,14 @@ export default function KayitPage() {
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
+
+    // Capture redirect URL from query params
+    useEffect(() => {
+        const redirect = searchParams.get('redirect');
+        if (redirect) {
+            setReturnUrl(redirect);
+        }
+    }, [searchParams, setReturnUrl]);
 
     const handleChange = (field: string, value: string) => {
         setForm(f => ({ ...f, [field]: value }));
@@ -65,9 +75,11 @@ export default function KayitPage() {
         }
 
         setLoading(true);
-        const { error: authErr } = await signUpWithEmail(form.email, form.password, { 
-            ad: form.ad,
-            avatar: avatarSeed 
+        const supabase = createClient();
+        const { error: authErr } = await supabase.auth.signUp({
+            email: form.email,
+            password: form.password,
+            options: { data: { ad: form.ad, avatar: avatarSeed } },
         });
         setLoading(false);
 
@@ -75,7 +87,11 @@ export default function KayitPage() {
             setError('Kayıt olunamadı: ' + authErr.message);
         } else {
             setSuccess('Hesabın oluşturuldu! E-postanı kontrol et ve doğrula. Sonra panele yönlendirileceksin...');
-            setTimeout(() => router.push('/panel'), 2000);
+            // Oturum çerezlerinin ayarlanmasını bekle
+            await new Promise(r => setTimeout(r, 500));
+            // Use stored return URL or default to panel
+            const returnUrl = (typeof window !== 'undefined') ? localStorage.getItem('frog_return_url') : null;
+            router.push(returnUrl || '/panel');
         }
     };
 
@@ -370,5 +386,13 @@ export default function KayitPage() {
                 </div>
             </motion.div>
         </main>
+    );
+}
+
+export default function KayitPage() {
+    return (
+        <Suspense fallback={<div className="page-wrapper min-h-screen flex items-center justify-center"><div className="animate-pulse text-gray-400">Yükleniyor...</div></div>}>
+            <KayitPageContent />
+        </Suspense>
     );
 }

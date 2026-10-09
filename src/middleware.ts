@@ -28,35 +28,10 @@ export async function middleware(request: NextRequest) {
     );
 
     // Refresh session if expired - required for Server Components
-    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.auth.getUser();
 
-    // Protected routes
-    const protectedPaths = ['/panel'];
-    const isProtectedPath = protectedPaths.some(path => 
-        request.nextUrl.pathname.startsWith(path)
-    );
-
-    // Auth routes that should redirect to panel if already logged in
-    const authPaths = ['/giris', '/kayit'];
-    const isAuthPath = authPaths.some(path => 
-        request.nextUrl.pathname.startsWith(path)
-    );
-
-    if (isProtectedPath && !user) {
-        // Redirect to login
-        const url = request.nextUrl.clone();
-        url.pathname = '/giris';
-        url.searchParams.set('redirect', request.nextUrl.pathname);
-        return NextResponse.redirect(url);
-    }
-
-    if (isAuthPath && user) {
-        // Redirect to panel if already logged in
-        const redirectTo = request.nextUrl.searchParams.get('redirect') || '/panel';
-        const url = request.nextUrl.clone();
-        url.pathname = redirectTo;
-        return NextResponse.redirect(url);
-    }
+    // No server-side redirects for auth pages - let client handle it
+    // This allows logout to work properly (middleware won't redirect back to /panel)
 
     return supabaseResponse;
 }

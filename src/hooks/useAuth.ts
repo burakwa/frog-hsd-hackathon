@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import type { UserProfile } from '@/types';
 
+const RETURN_URL_KEY = 'frog_return_url';
+
 export function useAuth() {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -67,11 +69,30 @@ export function useAuth() {
         return { user: data.user, error };
     }, [supabase]);
 
-    const signOut = useCallback(async () => {
+    const signOut = useCallback(async (redirectTo?: string) => {
         await supabase.auth.signOut();
         setUser(null);
         setProfile(null);
+        // Clear stored return URL on logout
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(RETURN_URL_KEY);
+        }
+        // Redirect handled by caller if needed
+        return redirectTo;
     }, [supabase]);
+
+    const setReturnUrl = useCallback((url: string) => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(RETURN_URL_KEY, url);
+        }
+    }, []);
+
+    const getReturnUrl = useCallback(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem(RETURN_URL_KEY) || '/giris';
+        }
+        return '/giris';
+    }, []);
 
     const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
         if (!user) return { error: new Error('No user') };
@@ -96,6 +117,8 @@ export function useAuth() {
         signInWithEmail, 
         signUpWithEmail, 
         signOut,
+        setReturnUrl,
+        getReturnUrl,
         updateProfile,
     };
 }

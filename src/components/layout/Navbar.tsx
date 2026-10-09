@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import { Home, Gamepad2, TrendingUp, User, ShieldCheck, Menu, X, Star } from 'lucide-react';
+import { Home, Gamepad2, TrendingUp, User, ShieldCheck, Menu, X, Star, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProgress } from '@/hooks/useProgress';
@@ -20,7 +20,7 @@ const navItems = [
 export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
-    const { user, signOut } = useAuth();
+    const { user, signOut, getReturnUrl } = useAuth();
     const { totalStars } = useProgress();
     const [mobileOpen, setMobileOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -60,6 +60,14 @@ export default function Navbar() {
     }, [mobileOpen]);
 
     const closeMenu = () => setMobileOpen(false);
+
+    const handleSignOut = async () => {
+        const returnUrl = getReturnUrl();
+        await signOut();
+        // Small delay to ensure auth state is cleared
+        await new Promise(r => setTimeout(r, 100));
+        router.push(returnUrl);
+    };
 
     return (
         <header className="relative z-20 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0">
@@ -103,9 +111,10 @@ export default function Navbar() {
                                     <span className="font-fun text-green-700">{totalStars}</span>
                                 </div>
                                 <button
-                                    onClick={signOut}
+                                    onClick={handleSignOut}
                                     className="btn btn-ghost btn-small text-red-600 hover:bg-red-50 border-red-200"
                                 >
+                                    <LogOut className="w-4 h-4 mr-1" />
                                     Çıkış
                                 </button>
                             </div>
@@ -166,10 +175,10 @@ export default function Navbar() {
                                 <div className="pt-4 border-t border-gray-100 space-y-2">
                                     {user ? (
                                         <button
-                                            onClick={() => { signOut(); router.push('/'); closeMenu(); }}
+                                            onClick={async () => { await handleSignOut(); closeMenu(); }}
                                             className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-rounded text-red-600 hover:bg-red-50 transition-colors"
                                         >
-                                            <User className="w-5 h-5" />
+                                            <LogOut className="w-5 h-5" />
                                             <span>Çıkış Yap</span>
                                         </button>
                                     ) : (

@@ -2,6 +2,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Home, Gamepad2, TrendingUp, User, ShieldCheck, LogOut, Star } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,7 +17,15 @@ const navItems = [
 
 export default function Sidebar() {
     const pathname = usePathname();
-    const { signOut, user } = useAuth();
+    const router = useRouter();
+    const { signOut, user, getReturnUrl } = useAuth();
+
+    const handleSignOut = async () => {
+        const returnUrl = getReturnUrl();
+        await signOut();
+        await new Promise(r => setTimeout(r, 100));
+        router.push(returnUrl);
+    };
 
     return (
         <aside className="hidden md:flex flex-col fixed left-0 top-0 h-full w-64 bg-slate-950 border-r-4 border-slate-800 z-40 p-5 select-none scanlines">
@@ -72,7 +81,7 @@ export default function Sidebar() {
 
             {/* Sign Out Button */}
             <button
-                onClick={signOut}
+                onClick={handleSignOut}
                 className="pixel-btn bg-slate-900 hover:bg-red-950 text-slate-400 hover:text-red-400 border-slate-700 hover:border-red-600 py-2.5 px-3 text-[11px] flex items-center gap-2 mt-auto"
             >
                 <LogOut size={14} />

@@ -10,7 +10,7 @@ import { starsToLevel } from '@/lib/utils/helpers';
 import { useRouter } from 'next/navigation';
 
 export default function ProfilPage() {
-    const { user, profile, updateProfile, signOut } = useAuth();
+    const { user, profile, updateProfile, signOut, getReturnUrl } = useAuth();
     const { totalStars, badges } = useProgress();
     const router = useRouter();
 
@@ -76,8 +76,10 @@ export default function ProfilPage() {
     };
 
     const handleLogout = async () => {
+        const returnUrl = getReturnUrl();
         await signOut();
-        router.push('/');
+        await new Promise(r => setTimeout(r, 100));
+        router.push(returnUrl);
     };
 
     const handleRandomAvatar = () => {
