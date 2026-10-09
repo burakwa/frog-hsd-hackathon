@@ -22,9 +22,7 @@ export default function LandingPage() {
             {/* Top Navigation */}
             <header className="relative z-10 w-full max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center shadow-lg">
-                        <Star className="w-5 h-5 text-white" />
-                    </span>
+                    <img src="/assets/logo.png" alt="FrogFriends" className="w-10 h-10 object-contain" />
                     <span className="font-fun text-xl text-gray-800">FROG<span className="text-green-600">FRIENDS</span></span>
                 </div>
                 <nav className="hidden md:flex items-center gap-6">

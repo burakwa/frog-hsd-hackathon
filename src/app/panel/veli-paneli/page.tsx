@@ -2,7 +2,7 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Printer, Star, FileText, Brain, AlertTriangle, Lightbulb, Download, TrendingUp, Target, Award, Sparkles, X, Loader2 } from 'lucide-react';
+import { ShieldCheck, Printer, Star, FileText, Brain, AlertTriangle, Lightbulb, Download, TrendingUp, Target, Award, Sparkles, X, Loader2, CheckCircle2, Clock, Heart, BookOpen, Dumbbell } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProgress } from '@/hooks/useProgress';
 import Character from '@/components/game/Character';
@@ -11,7 +11,6 @@ import { useAIAnalysis, useAIProgressReport } from '@/hooks/useAIAnalysis';
 export default function VeliPaneliPage() {
     const { user, profile } = useAuth();
     const { sessions, totalStars, badges } = useProgress();
-    const { analyze, analyzing: aiAnalyzing } = useAIAnalysis();
     const { generate: generateAIReport, generating: aiGenerating, report: aiReport } = useAIProgressReport();
 
     const [showAIReport, setShowAIReport] = useState(false);
@@ -89,6 +88,7 @@ export default function VeliPaneliPage() {
         ? Math.round(sessions.reduce((a, s) => a + s.skor, 0) / sessions.length)
         : 0;
     const totalMinutes = Math.round(sessions.reduce((a, s) => a + (s.sure_saniye || 30), 0) / 60);
+    const currentLevel = Math.floor(totalStars / 10) + 1;
 
     return (
         <div className="space-y-6 animate-slide-up">
@@ -98,12 +98,14 @@ export default function VeliPaneliPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
-                <div>
-                    <h1 className="font-fun text-2xl md:text-3xl text-gray-800 flex items-center gap-2">
-                        <ShieldCheck className="w-6 h-6 text-green-600" />
-                        Veli & Terapist Raporu
-                    </h1>
-                    <p className="text-gray-500 mt-1">Konuşma gelişimi detay analizi ve ev önerileri</p>
+                <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center shadow-lg">
+                        <img src="/assets/logo.png" alt="FrogFriends" className="w-8 h-8 object-contain" />
+                    </div>
+                    <div>
+                        <h1 className="font-fun text-2xl md:text-3xl text-gray-800">Veli & Terapist Raporu</h1>
+                        <p className="text-gray-500 text-sm">Konuşma gelişimi detay analizi ve ev önerileri</p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <button
@@ -111,7 +113,7 @@ export default function VeliPaneliPage() {
                             await generateAIReport({
                                 childName: displayName,
                                 totalStars,
-                                level: Math.floor(totalStars / 10) + 1,
+                                level: currentLevel,
                                 sessions,
                                 soundAccuracy: articulationData.map(a => ({ sound: a.sound, accuracy: a.accuracy, status: a.status })),
                                 badges: badges.map(b => ({ ad: b.ad, kazanildi: b.kazanildi }))
@@ -151,54 +153,28 @@ export default function VeliPaneliPage() {
                 className="card card-elevated p-6 relative overflow-hidden"
             >
                 <div className="absolute top-0 right-0 w-48 h-48 bg-green-100/50 rounded-full blur-3xl" />
-                
                 <div className="relative flex flex-col sm:flex-row items-center gap-6">
-                    {/* Avatar */}
                     <div className="relative shrink-0">
                         <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white border-4 border-green-200 shadow-xl p-2 flex items-center justify-center">
                             <Character mood="happy" size={80} showLilypad={true} />
                         </div>
                         <div className="absolute -bottom-2 -right-2 bg-green-500 border-3 border-white text-white font-fun text-xs px-3 py-1 rounded-full shadow-lg">
-                            Rapor
+                            LVL {currentLevel}
                         </div>
                     </div>
-
-                    {/* Info */}
                     <div className="relative flex-1 text-center sm:text-left space-y-2">
                         <p className="font-rounded text-sm text-green-700">ÖĞRENCİ</p>
                         <h2 className="font-fun text-2xl md:text-3xl text-green-800">{displayName.toUpperCase()}</h2>
                         <p className="text-gray-500">
-                            {user?.email ? 'Kayıtlı Kullanıcı' : 'Yerel Profil'} • Seviye {sessions.length > 0 ? Math.floor(totalStars / 10) + 1 : 1}
+                            {user?.email ? 'Kayıtlı Kullanıcı' : 'Yerel Profil'} • Seviye {currentLevel}
                         </p>
                     </div>
                 </div>
-
-                {/* Stats Grid */}
                 <div className="relative mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                     <StatMini label="Toplam Yıldız" value={totalStars} icon={<Star className="w-5 h-5" />} color="yellow" />
                     <StatMini label="Ortalama Doğruluk" value={`%${avgScore || '--'}`} icon={<Brain className="w-5 h-5" />} color="blue" />
                     <StatMini label="Tamamlanan Seans" value={sessions.length} icon={<FileText className="w-5 h-5" />} color="green" />
-                    <StatMini label="Toplam Pratik" value={`${totalMinutes} dk`} icon={<TrendingUp className="w-5 h-5" />} color="purple" />
-                </div>
-
-                {/* Earned Badges Preview */}
-                <div className="relative mt-6 pt-6 border-t border-gray-100">
-                    <p className="font-rounded text-sm text-gray-500 mb-3">Kazanılan Rozetler</p>
-                    <div className="flex flex-wrap gap-2">
-                        {badges.filter(b => b.kazanildi).slice(0, 4).map(badge => (
-                            <span key={badge.id} className="badge bg-yellow-100 text-yellow-700">
-                                {badge.emoji} {badge.ad}
-                            </span>
-                        ))}
-                        {badges.filter(b => b.kazanildi).length > 4 && (
-                            <span className="badge bg-gray-100 text-gray-600">
-                                +{badges.filter(b => b.kazanildi).length - 4} daha
-                            </span>
-                        )}
-                        {badges.filter(b => b.kazanildi).length === 0 && (
-                            <span className="badge bg-gray-100 text-gray-500">Henüz rozet yok</span>
-                        )}
-                    </div>
+                    <StatMini label="Toplam Pratik" value={`${totalMinutes} dk`} icon={<Clock className="w-5 h-5" />} color="purple" />
                 </div>
             </motion.div>
 
@@ -216,7 +192,6 @@ export default function VeliPaneliPage() {
                     </div>
                     <span className="badge bg-purple-100 text-purple-700 text-xs">Web Speech API + Levenshtein</span>
                 </div>
-
                 <div className="space-y-4">
                     {articulationData.map((item, idx) => {
                         const colors = colorClasses[item.color as keyof typeof colorClasses];
@@ -228,7 +203,6 @@ export default function VeliPaneliPage() {
                                 transition={{ delay: 0.3 + idx * 0.1 }}
                                 className={`p-5 rounded-xl ${colors.bg} border ${colors.border} hover:shadow-card transition-shadow`}
                             >
-                                {/* Header */}
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                                     <div>
                                         <span className="font-fun text-base text-gray-800">{item.sound}</span>
@@ -239,8 +213,6 @@ export default function VeliPaneliPage() {
                                         <span className="font-fun text-xl {colors.text}">{item.accuracy}%</span>
                                     </div>
                                 </div>
-
-                                {/* Progress Bar */}
                                 <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden mb-4">
                                     <motion.div
                                         initial={{ width: 0 }}
@@ -249,8 +221,6 @@ export default function VeliPaneliPage() {
                                         className={`h-full rounded-full ${colors.bar}`}
                                     />
                                 </div>
-
-                                {/* Details Grid */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className={`p-4 rounded-xl ${colors.statusBg} border ${colors.border}`}>
                                         <div className="font-fun text-xs text-gray-500 mb-1 flex items-center gap-1">
@@ -284,7 +254,6 @@ export default function VeliPaneliPage() {
                     <Lightbulb className="w-5 h-5 text-yellow-500" />
                     <h2 className="font-fun text-lg text-gray-800">Evde Uygulanabilecek Oyunlar</h2>
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {homeTips.map((tip, i) => (
                         <motion.div
@@ -301,6 +270,37 @@ export default function VeliPaneliPage() {
                             <p className="text-gray-600 text-sm leading-relaxed">{tip.desc}</p>
                         </motion.div>
                     ))}
+                </div>
+            </motion.div>
+
+            {/* AI Report History */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="card card-elevated p-6"
+            >
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-yellow-500" />
+                        <h2 className="font-fun text-lg text-gray-800">AI Gelişim Raporları</h2>
+                    </div>
+                </div>
+                <div className="space-y-3">
+                    <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-100">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-fun text-base text-gray-800">Son AI Raporu</h3>
+                            <span className="badge bg-green-100 text-green-700">Hazır</span>
+                        </div>
+                        <button
+                            onClick={() => aiReport && setShowAIReport(true)}
+                            disabled={!aiReport}
+                            className="btn btn-primary w-full"
+                        >
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            {aiReport ? 'Raporu Görüntüle' : 'AI Raporu Oluştur'}
+                        </button>
+                    </div>
                 </div>
             </motion.div>
 
@@ -329,14 +329,19 @@ export default function VeliPaneliPage() {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="card card-elevated p-6 md:p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+                            className="card card-elevated p-6 md:p-8 max-w-3xl w-full max-h-[85vh] overflow-y-auto"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="font-fun text-xl text-gray-800 flex items-center gap-2">
-                                    <Sparkles className="w-5 h-5 text-yellow-500" />
-                                    AI Gelişim Raporu
-                                </h2>
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center">
+                                        <Sparkles className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="font-fun text-xl text-gray-800">AI Gelişim Raporu</h2>
+                                        <p className="text-sm text-gray-500">{displayName} • {new Date().toLocaleDateString('tr-TR')}</p>
+                                    </div>
+                                </div>
                                 <button
                                     onClick={() => setShowAIReport(false)}
                                     className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
@@ -344,16 +349,81 @@ export default function VeliPaneliPage() {
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
-                            <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
-                                {aiReport}
-                            </div>
-                            <div className="mt-6 pt-4 border-t border-gray-100 flex justify-end">
-                                <button
-                                    onClick={() => setShowAIReport(false)}
-                                    className="btn btn-secondary"
-                                >
-                                    Kapat
-                                </button>
+                            <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+                                {/* Summary */}
+                                {aiReport.summary && (
+                                    <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-100">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <FileText className="w-4 h-4 text-green-600" />
+                                            <span className="font-fun text-sm text-green-800">Genel Değerlendirme</span>
+                                        </div>
+                                        <p className="text-gray-700 leading-relaxed">{aiReport.summary}</p>
+                                    </div>
+                                )}
+
+                                {/* Strengths */}
+                                {aiReport.strengths && aiReport.strengths.length > 0 && (
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                            <span className="font-fun text-sm text-gray-800">Güçlü Yönler</span>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            {aiReport.strengths.map((strength: string, i: number) => (
+                                                <div key={i} className="p-3 bg-green-50 border border-green-100 rounded-xl flex items-center gap-2">
+                                                    <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                                    <span className="text-sm text-gray-700">{strength}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Improvements */}
+                                {aiReport.improvements && aiReport.improvements.length > 0 && (
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Target className="w-4 h-4 text-orange-500" />
+                                            <span className="font-fun text-sm text-gray-800">Gelişim Alanları</span>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            {aiReport.improvements.map((improvement: string, i: number) => (
+                                                <div key={i} className="p-3 bg-orange-50 border border-orange-100 rounded-xl flex items-center gap-2">
+                                                    <Target className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                                                    <span className="text-sm text-gray-700">{improvement}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Weekly Plan */}
+                                {aiReport.weeklyPlan && aiReport.weeklyPlan.length > 0 && (
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <BookOpen className="w-4 h-4 text-blue-500" />
+                                            <span className="font-fun text-sm text-gray-800">Haftalık Plan</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {aiReport.weeklyPlan.map((plan: string, i: number) => (
+                                                <div key={i} className="p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-2">
+                                                    <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center font-fun text-xs text-blue-700">{i + 1}</span>
+                                                    <span className="text-sm text-gray-700">{plan}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Footer */}
+                                <div className="pt-4 border-t border-gray-100 flex justify-end">
+                                    <button
+                                        onClick={() => setShowAIReport(false)}
+                                        className="btn btn-secondary"
+                                    >
+                                        Kapat
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     </motion.div>
@@ -379,6 +449,7 @@ export default function VeliPaneliPage() {
                     body { background: white !important; }
                     main { padding: 0 !important; }
                     button { display: none !important; }
+                    .fixed { display: none !important; }
                 }
             `}</style>
         </div>

@@ -31,10 +31,8 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link href="/panel" className="flex items-center gap-2" aria-label="FrogFriends Ana Sayfa">
-                        <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center shadow-lg">
-                            <Star className="w-5 h-5 text-white" />
-                        </span>
-                        <span className="font-fun text-xl text-gray-800 hidden sm:block">FrogFriends</span>
+                        <img src="/assets/logo.png" alt="FrogFriends" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
+                        <span className="font-fun text-xl text-gray-800">FROG<span className="text-green-600">FRIENDS</span></span>
                     </Link>
 
                     {/* Desktop Navigation */}

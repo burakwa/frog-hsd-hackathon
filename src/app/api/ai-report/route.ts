@@ -3,10 +3,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { generateProgressReport } from '@/lib/ai/openrouter';
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy initialization of Supabase client
+function getSupabaseClient() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (!url || !key) {
+        return null;
+    }
+    
+    return createClient(url, key);
+}
 
 export async function POST(request: NextRequest) {
     try {
@@ -21,9 +28,11 @@ export async function POST(request: NextRequest) {
 
         // Get user from auth header
         const authHeader = request.headers.get('authorization');
-        let userId = data.userId; // Fallback to passed userId
+        let userId = data.userId;
         
-        if (authHeader) {
+        const supabase = getSupabaseClient();
+        
+        if (authHeader && supabase) {
             const token = authHeader.replace('Bearer ', '');
             const { data: { user } } = await supabase.auth.getUser(token);
             if (user) userId = user.id;
@@ -39,8 +48,8 @@ export async function POST(request: NextRequest) {
             reportData = { summary: reportString, strengths: [], improvements: [], weeklyPlan: [] };
         }
 
-        // Save to Supabase if user is authenticated
-        if (userId) {
+        // Save to Supabase if user is authenticated and client available
+        if (userId && supabase) {
             try {
                 await supabase.from('ai_reports').insert({
                     user_id: userId,
@@ -79,6 +88,14 @@ export async function GET(request: NextRequest) {
             return NextResponse.json(
                 { error: 'Authorization gerekli' },
                 { status: 401 }
+            );
+        }
+
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            return NextResponse.json(
+                { error: 'Supabase yapılandırılmamış' },
+                { status: 503 }
             );
         }
 
