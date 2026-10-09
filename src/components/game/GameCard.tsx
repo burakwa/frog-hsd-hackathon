@@ -1,8 +1,8 @@
-// components/game/GameCard.tsx
+// components/game/GameCard.tsx — Retro Arcade Game Card
 'use client';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Lock } from 'lucide-react';
+import { Lock, Play } from 'lucide-react';
 import type { GameId } from '@/types';
 
 interface Props {
@@ -22,42 +22,42 @@ export default function GameCard({ title, description, emoji, gradient, locked, 
     return (
         <Wrapper href={locked ? '#' : href} className="block focus:outline-none">
             <motion.div
-                whileHover={locked ? {} : { y: -6, scale: 1.02 }}
-                whileTap={locked ? {} : { scale: 0.97 }}
-                className={`relative rounded-[1.75rem] p-6 shadow-lg cursor-pointer overflow-hidden ${locked ? 'opacity-60 cursor-not-allowed' : ''}`}
+                whileHover={locked ? {} : { y: -4, scale: 1.02 }}
+                whileTap={locked ? {} : { scale: 0.98 }}
+                className={`relative rounded-2xl p-5 border-4 border-black shadow-[6px_6px_0px_#000] cursor-pointer overflow-hidden transition-all ${
+                    locked ? 'opacity-60 cursor-not-allowed' : ''
+                }`}
                 style={{ background: gradient }}
             >
-                {/* Background decoration */}
-                <div
-                    className="absolute -right-6 -top-6 w-28 h-28 rounded-full opacity-20"
-                    style={{ background: 'rgba(255,255,255,0.5)' }}
-                />
-                <div
-                    className="absolute -right-2 -bottom-6 w-20 h-20 rounded-full opacity-10"
-                    style={{ background: 'rgba(255,255,255,0.8)' }}
-                />
+                {/* Retro CRT highlight sheen */}
+                <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
 
                 {locked && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/30 rounded-[1.75rem] z-10">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-2xl z-10">
                         <Lock size={32} className="text-white" />
                     </div>
                 )}
 
-                {/* Star badge */}
+                {/* Star rating chip */}
                 {bestStars > 0 && (
-                    <div className="absolute top-4 right-4 bg-white/90 rounded-full px-2 py-1 text-xs font-bold text-yellow-600">
-                        {'⭐'.repeat(bestStars)}
+                    <div className="absolute top-3 right-3 bg-black/80 border-2 border-yellow-400 rounded-lg px-2 py-0.5 text-xs font-pixel text-yellow-300">
+                        {'★'.repeat(bestStars)}
                     </div>
                 )}
 
-                <div className="text-5xl mb-3">{emoji}</div>
-                <h3 className="text-xl font-black text-white mb-1">{title}</h3>
-                <p className="text-sm text-white/80 font-semibold leading-snug">{description}</p>
+                <div className="text-4xl mb-2">{emoji}</div>
+                <h3 className="font-pixel text-base text-white mb-2 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+                    {title}
+                </h3>
+                <p className="font-arcade text-xs text-white/90 font-bold leading-relaxed mb-4">
+                    {description}
+                </p>
 
                 {!locked && (
-                    <div className="mt-4">
-                        <span className="inline-block bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">
-                            ▶ Oyna
+                    <div className="mt-auto">
+                        <span className="inline-flex items-center gap-1.5 bg-black/80 hover:bg-black text-yellow-300 border-2 border-yellow-400 font-pixel text-[10px] px-3 py-1.5 rounded-lg shadow-sm">
+                            <Play size={10} className="fill-yellow-300" />
+                            OYNA
                         </span>
                     </div>
                 )}

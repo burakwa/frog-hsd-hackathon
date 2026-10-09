@@ -27,7 +27,7 @@ export default function Test() {
     };
 
     return (
-        <div className="p-8">
+        <div className="pt-4 md:pt-6 px-4 md:px-6 pb-4">
             <button onClick={start} disabled={listening}
                 className="bg-blue-500 text-white p-4 rounded-full">
                 {listening ? '🔴 Dinliyorum...' : '🎤 Konuş'}

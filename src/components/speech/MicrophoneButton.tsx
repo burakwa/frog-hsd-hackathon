@@ -1,4 +1,4 @@
-// components/speech/MicrophoneButton.tsx
+// components/speech/MicrophoneButton.tsx — Retro Arcade Mikrofon Butonu
 'use client';
 import { motion } from 'framer-motion';
 import { Mic, Square } from 'lucide-react';
@@ -12,8 +12,8 @@ interface Props {
 
 const sizes = {
     sm: { btn: 'w-16 h-16', icon: 24, rings: 'w-20 h-20' },
-    md: { btn: 'w-24 h-24', icon: 36, rings: 'w-32 h-32' },
-    lg: { btn: 'w-32 h-32', icon: 48, rings: 'w-44 h-44' },
+    md: { btn: 'w-22 h-22', icon: 34, rings: 'w-28 h-28' },
+    lg: { btn: 'w-28 h-28', icon: 44, rings: 'w-36 h-36' },
 };
 
 export default function MicrophoneButton({ isListening, disabled = false, onToggle, size = 'md' }: Props) {
@@ -26,20 +26,21 @@ export default function MicrophoneButton({ isListening, disabled = false, onTogg
                 : 'sm'
             : size;
     const s = sizes[resolvedKey];
+
     return (
-        <div className="relative flex items-center justify-center" style={{ width: 'fit-content' }}>
-            {/* Pulse rings when listening */}
+        <div className="relative flex items-center justify-center select-none" style={{ width: 'fit-content' }}>
+            {/* Retro pulse rings when listening */}
             {isListening && (
                 <>
                     <motion.div
-                        className={`absolute ${s.rings} rounded-full border-2 border-red-400`}
-                        animate={{ scale: [1, 1.5], opacity: [0.6, 0] }}
-                        transition={{ duration: 1.2, repeat: Infinity }}
+                        className={`absolute ${s.rings} rounded-full border-3 border-red-500`}
+                        animate={{ scale: [1, 1.4], opacity: [0.8, 0] }}
+                        transition={{ duration: 1.0, repeat: Infinity }}
                     />
                     <motion.div
-                        className={`absolute ${s.rings} rounded-full border-2 border-red-300`}
-                        animate={{ scale: [1, 1.8], opacity: [0.4, 0] }}
-                        transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }}
+                        className={`absolute ${s.rings} rounded-full border-3 border-yellow-400`}
+                        animate={{ scale: [1, 1.7], opacity: [0.6, 0] }}
+                        transition={{ duration: 1.0, repeat: Infinity, delay: 0.3 }}
                     />
                 </>
             )}
@@ -47,22 +48,26 @@ export default function MicrophoneButton({ isListening, disabled = false, onTogg
             <motion.button
                 onClick={onToggle}
                 disabled={disabled}
-                whileTap={{ scale: 0.9 }}
-                animate={isListening ? { scale: [1, 1.05, 1] } : { scale: 1 }}
-                transition={isListening ? { repeat: Infinity, duration: 0.9 } : {}}
+                whileTap={{ scale: 0.94 }}
+                animate={isListening ? { scale: [1, 1.06, 1] } : { scale: 1 }}
+                transition={isListening ? { repeat: Infinity, duration: 0.8 } : {}}
                 className={`
                     ${s.btn} rounded-full flex items-center justify-center text-white
-                    shadow-xl transition-colors relative z-10
+                    border-4 border-black shadow-[4px_4px_0px_#000] transition-colors relative z-10 cursor-pointer
                     ${isListening
-                        ? 'bg-red-500 mic-listening'
+                        ? 'bg-red-500 animate-pulse'
                         : disabled
-                            ? 'bg-gray-300 cursor-not-allowed'
-                            : 'bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 cursor-pointer'
+                            ? 'bg-slate-700 cursor-not-allowed opacity-50'
+                            : 'bg-gradient-to-b from-emerald-400 to-emerald-600 hover:from-emerald-300 hover:to-emerald-500'
                     }
                 `}
                 aria-label={isListening ? 'Mikrofonu durdur' : 'Konuşmaya başla'}
             >
-                {isListening ? <Square size={s.icon} /> : <Mic size={s.icon} />}
+                {isListening ? (
+                    <Square size={s.icon} className="fill-white" />
+                ) : (
+                    <Mic size={s.icon} className="stroke-[2.5]" />
+                )}
             </motion.button>
         </div>
     );

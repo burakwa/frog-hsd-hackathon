@@ -1,9 +1,9 @@
-// app/panel/oyunlar/cumle-soyle/page.tsx — 3. Oyun: Cümle Tamamlama
+// app/panel/oyunlar/cumle-soyle/page.tsx — 3. Oyun: Cümle Tamamlama (Retro RPG Tarzı)
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Volume2, Sparkles, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Volume2, HelpCircle, CheckCircle2 } from 'lucide-react';
 import PraiseOverlay from '@/components/game/PraiseOverlay';
 import Character from '@/components/game/Character';
 import MicrophoneButton from '@/components/speech/MicrophoneButton';
@@ -34,7 +34,6 @@ export default function CumleSoylePage() {
 
     const current = sentences[exerciseIndex];
 
-    // Reset when exercise changes
     useEffect(() => {
         setMood('happy');
         setAnalysis(null);
@@ -45,7 +44,7 @@ export default function CumleSoylePage() {
         const list = [
             current.bosluk,
             ...['koşar', 'uyur', 'yürür', 'bakar'].filter(w => w !== current.bosluk).slice(0, 2),
-        ].sort(() => Math.random() - 0.5);
+        ].sort(() => 0.5 - ((current.id % 2) ? 0.3 : 0.7));
         setOptions(list);
     }, [exerciseIndex]);
 
@@ -68,8 +67,6 @@ export default function CumleSoylePage() {
 
         const targetWord = current.bosluk.toLowerCase();
         const spokenNormalized = transcript.toLowerCase();
-
-        // Check if the target word is inside transcript or matches
         const matchesWord = spokenNormalized.includes(targetWord);
         const result = analyze(targetWord, transcript);
 
@@ -100,7 +97,6 @@ export default function CumleSoylePage() {
     };
 
     const handleSelectOption = (word: string) => {
-        // Allow tapping word option too
         const targetWord = current.bosluk.toLowerCase();
         const result = analyze(targetWord, word.toLowerCase());
         setAnalysis(result);
@@ -123,111 +119,106 @@ export default function CumleSoylePage() {
     };
 
     return (
-        <main className="min-h-screen bg-game p-4 md:p-8 flex flex-col max-w-4xl mx-auto">
+        <main className="w-full min-h-screen bg-slate-950 pt-2 md:pt-4 px-4 md:px-6 pb-4 flex flex-col max-w-4xl mx-auto select-none">
             {/* Top Bar */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4 border-b-2 border-slate-800 pb-3">
                 <Link
                     href="/panel/oyunlar"
-                    className="flex items-center gap-2 text-purple-700 font-bold bg-white/80 px-4 py-2 rounded-2xl shadow-sm hover:bg-white transition-all"
+                    className="pixel-btn bg-slate-800 hover:bg-slate-700 text-cyan-400 py-2 px-3 text-xs flex items-center gap-1.5"
                 >
-                    <ArrowLeft size={18} />
-                    <span>Oyunlar</span>
+                    <ArrowLeft size={14} />
+                    <span>GERİ</span>
                 </Link>
-                <div className="bg-white/80 px-4 py-2 rounded-2xl font-bold text-sm text-purple-700 shadow-sm">
-                    Cümle {exerciseIndex + 1} / {sentences.length}
+                <div className="font-pixel text-yellow-400 text-xs bg-slate-900 border-2 border-yellow-400/50 px-3 py-1.5 rounded-lg shadow-sm">
+                    QUEST {exerciseIndex + 1} / {sentences.length}
                 </div>
             </div>
 
-            {/* Mascot & Exercise Card */}
-            <div className="card-glass text-center mb-6 relative">
-                <div className="flex justify-center mb-2">
-                    <Character mood={mood} size={84} />
-                </div>
+            {/* Retro RPG Dialogue Box Card */}
+            <div className="relative pixel-box bg-slate-900/90 border-cyan-400 p-6 rounded-2xl mb-4 overflow-hidden">
+                <div className="retro-lake-scene absolute inset-0 pointer-events-none z-0 opacity-35" aria-hidden="true" />
 
-                <span className="text-4xl mb-2 block">{current.emoji}</span>
+                <div className="relative z-10 flex flex-col items-center text-center">
+                    <div className="mb-2">
+                        <Character mood={mood} size={72} showLilypad={true} />
+                    </div>
 
-                {/* Sentence with Blank Highlight */}
-                <h1 className="text-2xl md:text-3xl font-black text-purple-900 mb-3 px-4">
-                    {completed ? (
-                        <span>
-                            {current.cumle.split('___')[0]}
-                            <span className="text-emerald-600 underline decoration-wavy px-2 bg-emerald-50 rounded-xl">
-                                {current.bosluk}
+                    <span className="text-4xl mb-2">{current.emoji}</span>
+
+                    {/* Sentence with Blank Highlight */}
+                    <h1 className="font-pixel text-lg md:text-xl text-white mb-4 leading-relaxed max-w-2xl">
+                        {completed ? (
+                            <span>
+                                {current.cumle.split('___')[0]}
+                                <span className="text-emerald-400 underline decoration-wavy px-2 bg-emerald-950/80 rounded border border-emerald-400">
+                                    {current.bosluk.toUpperCase()}
+                                </span>
+                                {current.cumle.split('___')[1]}
                             </span>
-                            {current.cumle.split('___')[1]}
-                        </span>
-                    ) : (
-                        <span>
-                            {current.cumle.split('___')[0]}
-                            <span className="inline-block border-b-4 border-dashed border-purple-500 text-purple-600 px-3 bg-purple-50 rounded-xl min-w-[80px]">
-                                ???
+                        ) : (
+                            <span>
+                                {current.cumle.split('___')[0]}
+                                <span className="inline-block border-b-4 border-dashed border-yellow-400 text-yellow-300 px-3 bg-yellow-950/60 rounded">
+                                    [ ??? ]
+                                </span>
+                                {current.cumle.split('___')[1]}
                             </span>
-                            {current.cumle.split('___')[1]}
-                        </span>
-                    )}
-                </h1>
+                        )}
+                    </h1>
 
-                {/* Voice Pronounce & Hint Actions */}
-                <div className="flex items-center justify-center gap-3 mt-4">
-                    <button
-                        onClick={() => speak(current.cumle.replace('___', '...'))}
-                        className="btn-secondary text-sm py-2 px-4 flex items-center gap-2"
-                    >
-                        <Volume2 size={18} />
-                        <span>Cümleyi Dinle</span>
-                    </button>
-
-                    <button
-                        onClick={() => setShowHint(h => !h)}
-                        className="bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-sm py-2 px-4 rounded-full flex items-center gap-2 transition-colors"
-                    >
-                        <HelpCircle size={18} />
-                        <span>İpucu {showHint ? 'Kapat' : 'Göster'}</span>
-                    </button>
-                </div>
-
-                <AnimatePresence>
-                    {showHint && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="mt-4 p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 text-sm font-semibold max-w-md mx-auto"
+                    {/* Audio & Hint Buttons */}
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => speak(current.cumle.replace('___', '...'))}
+                            className="pixel-btn bg-slate-800 hover:bg-slate-700 text-cyan-300 py-2 px-3 text-xs flex items-center gap-2"
                         >
-                            💡 {current.ipucu}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                            <Volume2 size={14} /> DİNLE
+                        </button>
+
+                        <button
+                            onClick={() => setShowHint(h => !h)}
+                            className="pixel-btn bg-amber-600 hover:bg-amber-500 text-slate-950 py-2 px-3 text-xs flex items-center gap-1.5"
+                        >
+                            <HelpCircle size={14} />
+                            <span>İPUCU {showHint ? 'KAPAT' : 'GÖSTER'}</span>
+                        </button>
+                    </div>
+
+                    <AnimatePresence>
+                        {showHint && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="mt-3 p-2.5 bg-amber-950 border border-amber-500 text-amber-200 text-xs font-arcade rounded-xl max-w-md mx-auto"
+                            >
+                                💡 İPUCU: {current.ipucu}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
             </div>
 
-            {/* Speaking & Interaction Section */}
-            <div className="card text-center mb-6 flex flex-col items-center gap-4">
-                <p className="text-sm font-bold text-gray-500">
-                    Eksik kelimeyi mikrofona söyle veya aşağıdaki seçeneklerden seç!
+            {/* Retro Microphone & Choice Pills Section */}
+            <div className="pixel-box p-4 rounded-xl flex flex-col items-center gap-3">
+                <p className="font-pixel text-[10px] text-slate-400 text-center">
+                    KELİMEYİ MİKROFONA SÖYLE VEYA AŞAĞIDAN SEÇ!
                 </p>
 
-                {/* Live Audio Visualizer */}
                 <SpeechVisualizer isActive={isListening} level={level} bars={9} />
 
-                {/* Microphone Button */}
                 <MicrophoneButton
                     isListening={isListening}
                     onToggle={handleToggleMic}
                     size={76}
                 />
 
-                {/* Spoken Word Display */}
                 {transcript && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-purple-50 px-5 py-2.5 rounded-2xl border border-purple-200 font-black text-purple-900 text-lg"
-                    >
-                        Senin söylediğin: &quot;{transcript}&quot;
-                    </motion.div>
+                    <div className="bg-slate-900 border border-cyan-400 font-pixel text-xs text-yellow-300 px-4 py-2 rounded-lg">
+                        DUYULAN: &quot;{transcript}&quot;
+                    </div>
                 )}
 
-                {/* Pronunciation Feedback */}
                 {analysis && (
                     <div className="w-full max-w-md">
                         <PronunciationFeedback
@@ -237,25 +228,25 @@ export default function CumleSoylePage() {
                     </div>
                 )}
 
-                {/* Choice Pills */}
-                <div className="mt-3 flex flex-wrap gap-2 justify-center">
+                {/* Choice Pills as Retro Arcade Buttons */}
+                <div className="mt-2 flex flex-wrap gap-2.5 justify-center">
                     {options.map((opt, i) => (
                         <button
                             key={i}
                             onClick={() => handleSelectOption(opt)}
-                            className="bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-800 font-black px-5 py-2.5 rounded-2xl border-2 border-purple-200 hover:border-purple-600 transition-all text-base shadow-sm active:scale-95"
+                            className="pixel-btn bg-slate-900 hover:bg-indigo-600 text-yellow-300 hover:text-white border-yellow-400 py-2.5 px-4 text-xs tracking-wider"
                         >
-                            {opt}
+                            ▶ {opt.toUpperCase()}
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Praise Overlay */}
             <PraiseOverlay
                 isOpen={showPraise}
                 stars={stars}
                 score={analysis?.score ?? 100}
+                message="CÜMLE TAMAMLANDI! 🌟"
                 onNext={handleNext}
                 onRetry={() => {
                     setShowPraise(false);

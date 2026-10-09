@@ -4,10 +4,10 @@ import type { ReactNode } from 'react';
 
 export default function PanelLayout({ children }: { children: ReactNode }) {
     return (
-        <div className="min-h-screen bg-app">
+        <div className="min-h-screen bg-slate-950 text-slate-100 scanlines">
             <Navbar />
             {/* Desktop: offset for sidebar */}
-            <div className="md:ml-64 pb-24 md:pb-8">
+            <div className="panel-main-content md:ml-64">
                 {children}
             </div>
         </div>

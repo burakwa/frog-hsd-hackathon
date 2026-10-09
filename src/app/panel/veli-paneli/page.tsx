@@ -1,17 +1,14 @@
-// app/panel/veli-paneli/page.tsx — Uzman & Veli Rapor Ekranı
+// app/panel/veli-paneli/page.tsx — Retro Veli ve Dil Terapisti Raporu
 'use client';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShieldCheck, Download, Printer, CheckCircle2, AlertTriangle, Lightbulb, Clock, BookOpen, Star, FileText } from 'lucide-react';
+import { ShieldCheck, Printer, CheckCircle2, AlertTriangle, Lightbulb, Star, FileText } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProgress } from '@/hooks/useProgress';
-import ProgressBar from '@/components/ui/ProgressBar';
 
 export default function VeliPaneliPage() {
     const { user } = useAuth();
     const { sessions, totalStars } = useProgress(user?.id);
-
-    const [filterPeriod, setFilterPeriod] = useState<'week' | 'month' | 'all'>('week');
 
     const articulationData = [
         {
@@ -19,8 +16,9 @@ export default function VeliPaneliPage() {
             category: 'Titreşimli Sesletim',
             accuracy: 78,
             detectedErrors: 'Kelime başında /y/ ile yer değiştirme (örn: "arı" -> "ayı")',
-            status: 'Gelişiyor',
-            statusColor: 'text-amber-700 bg-amber-100',
+            status: 'GELİŞİYOR',
+            statusColor: 'text-yellow-400 bg-yellow-950 border-yellow-500',
+            barColor: 'bg-yellow-400',
             recommendation: 'Ayna karşısında dil ucunu damağa değdirerek motor titreşim çalışmaları yapın.',
         },
         {
@@ -28,8 +26,9 @@ export default function VeliPaneliPage() {
             category: 'Sürtünmeli Sesletim',
             accuracy: 92,
             detectedErrors: 'Hafif /s/ kayması, çoğunlukla doğru telaffuz',
-            status: 'Başarılı',
-            statusColor: 'text-emerald-700 bg-emerald-100',
+            status: 'BAŞARILI',
+            statusColor: 'text-emerald-400 bg-emerald-950 border-emerald-500',
+            barColor: 'bg-emerald-400',
             recommendation: 'Mevcut başarı korunuyor. Cümle içinde kullanım pekiştirilebilir.',
         },
         {
@@ -37,8 +36,9 @@ export default function VeliPaneliPage() {
             category: 'Patlamalı Sesletim',
             accuracy: 72,
             detectedErrors: '/t/ veya /s/ ile karışma eğilimi',
-            status: 'Öncelikli Takip',
-            statusColor: 'text-rose-700 bg-rose-100',
+            status: 'ÖNCELİKLİ',
+            statusColor: 'text-rose-400 bg-rose-950 border-rose-500',
+            barColor: 'bg-rose-500',
             recommendation: 'Dudak yuvarlama ve patlama egzersizleriyle hece bazlı pratik önerilir.',
         },
         {
@@ -46,23 +46,24 @@ export default function VeliPaneliPage() {
             category: 'Damak / Diş Ayrımı',
             accuracy: 88,
             detectedErrors: 'Genel olarak ayırt ediliyor, nadir önleştirme',
-            status: 'İyi Düzeyde',
-            statusColor: 'text-emerald-700 bg-emerald-100',
+            status: 'İYİ DÜZEYDE',
+            statusColor: 'text-cyan-400 bg-cyan-950 border-cyan-500',
+            barColor: 'bg-cyan-400',
             recommendation: 'Özellikle arka damak hissi için su ile gargara oyunu oynanabilir.',
         },
     ];
 
     const homeTips = [
         {
-            title: '1. Ayna Karşısında Taklit',
+            title: '1. AYNA KARŞISINDA TAKLİT',
             desc: 'Çocuğunuzla ayna karşısına geçin. Dilini burnuna, çenesine ve yanaklarına değdirmesini isteyerek dil kaslarını güçlendirin.',
         },
         {
-            title: '2. Üfleme ve Nefes Egzersizleri',
+            title: '2. ÜFLEME VE NEFES OYUNU',
             desc: 'Pipetle pamuk yuvarlama, köpük üfleme gibi oyunlar sesleri doğru basmak için diyafram ve nefes kontrolü kazandırır.',
         },
         {
-            title: '3. Pozitif Pekiştirme & Sabır',
+            title: '3. POZİTİF MODEL OLMA',
             desc: 'Hatalı söylediğinde "yanlış söyledin" demek yerine, doğru kelimeyi doğal akışta siz tekrar ederek model olun.',
         },
     ];
@@ -74,103 +75,99 @@ export default function VeliPaneliPage() {
     };
 
     return (
-        <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-6 print:p-0 print:m-0">
+        <div className="w-full pt-2 md:pt-4 px-4 md:px-6 pb-4 max-w-4xl mx-auto space-y-6 select-none print:bg-white print:text-black">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-slate-800 pb-4">
                 <div>
                     <div className="flex items-center gap-2">
-                        <ShieldCheck className="text-purple-600" size={28} />
-                        <h1 className="text-2xl md:text-3xl font-black text-purple-950">
-                            Veli & Dil Terapisti Raporu
+                        <ShieldCheck className="text-yellow-400" size={26} />
+                        <h1 className="font-pixel text-lg md:text-2xl text-yellow-300 drop-shadow">
+                            VELİ & TERAPİST RAPORU
                         </h1>
                     </div>
-                    <p className="text-gray-500 font-semibold text-sm mt-1">
-                        Klinik artikülasyon ve sesletim ilerleme değerlendirmesi
+                    <p className="font-arcade text-xs text-slate-400 mt-1">
+                        KLİNİK ARTİKÜLASYON VE SESLETİM DEĞERLENDİRME PANELİ
                     </p>
                 </div>
 
                 <div className="flex items-center gap-2 print:hidden">
                     <button
                         onClick={handlePrint}
-                        className="btn-primary text-xs py-2 px-4 flex items-center gap-2"
+                        className="pixel-btn bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-2.5 px-4 text-xs flex items-center gap-2"
                     >
                         <Printer size={16} />
-                        <span>Raporu Yazdır / PDF</span>
+                        <span>YAZDIR / PDF</span>
                     </button>
                 </div>
             </div>
 
             {/* Child Summary Sheet Card */}
-            <div className="card border border-purple-100 p-6 bg-gradient-to-br from-white via-purple-50/30 to-indigo-50/30">
+            <div className="pixel-box p-5 rounded-2xl bg-slate-900 border-indigo-500">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center sm:text-left">
                     <div>
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Öğrenci</span>
-                        <p className="text-lg font-black text-purple-900">
-                            {user?.user_metadata?.ad ?? 'Minik Oyuncu'}
+                        <span className="font-pixel text-[9px] text-slate-400 block mb-0.5">ÖĞRENCİ</span>
+                        <p className="font-pixel text-sm text-yellow-300">
+                            {user?.user_metadata?.ad ?? 'KAHRAMAN'}
                         </p>
                     </div>
                     <div>
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Toplam Yıldız</span>
-                        <p className="text-lg font-black text-amber-600 flex items-center justify-center sm:justify-start gap-1">
-                            <Star size={16} className="fill-amber-500" />
-                            {totalStars} Yıldız
+                        <span className="font-pixel text-[9px] text-slate-400 block mb-0.5">TOPLAM YILDIZ</span>
+                        <p className="font-pixel text-sm text-yellow-400 flex items-center justify-center sm:justify-start gap-1">
+                            ★ {totalStars}
                         </p>
                     </div>
                     <div>
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Tamamlanan Seans</span>
-                        <p className="text-lg font-black text-purple-900">{Math.max(sessions.length, 14)} Seans</p>
+                        <span className="font-pixel text-[9px] text-slate-400 block mb-0.5">SEANS SAYISI</span>
+                        <p className="font-pixel text-sm text-emerald-400">{Math.max(sessions.length, 14)} SEANS</p>
                     </div>
                     <div>
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Genel Başarı Ort.</span>
-                        <p className="text-lg font-black text-emerald-600">%85 Doğruluk</p>
+                        <span className="font-pixel text-[9px] text-slate-400 block mb-0.5">ORT. BAŞARI</span>
+                        <p className="font-pixel text-sm text-cyan-400">%85 DOĞRULUK</p>
                     </div>
                 </div>
             </div>
 
             {/* Articulation & Phoneme Clinical Breakdown */}
-            <div className="card p-6 space-y-4">
-                <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                    <h2 className="text-lg font-black text-purple-900 flex items-center gap-2">
-                        <FileText size={20} className="text-purple-600" />
-                        <span>Artikülasyon ve Fonetik Hata Analizi</span>
+            <div className="pixel-box p-5 rounded-2xl bg-slate-900 border-slate-700 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <h2 className="font-pixel text-xs md:text-sm text-yellow-300 flex items-center gap-2">
+                        <FileText size={16} />
+                        <span>ARTİKÜLASYON VE FONETİK ANALİZ</span>
                     </h2>
-                    <span className="text-xs text-gray-500 font-bold">Web Speech & Levenshtein Metriği</span>
+                    <span className="font-arcade text-[11px] text-slate-400">WEB SPEECH & LEVENSHTEIN</span>
                 </div>
 
                 <div className="space-y-4">
                     {articulationData.map((item, idx) => (
                         <div
                             key={idx}
-                            className="p-4 rounded-2xl bg-white border border-gray-200/80 shadow-sm space-y-2 hover:border-purple-200 transition-colors"
+                            className="p-4 rounded-xl bg-slate-950 border-2 border-slate-800 space-y-2.5"
                         >
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                                 <div>
-                                    <span className="text-base font-black text-purple-950">{item.sound}</span>
-                                    <span className="text-xs font-semibold text-gray-400 ml-2">({item.category})</span>
+                                    <span className="font-pixel text-xs text-white">{item.sound}</span>
+                                    <span className="font-arcade text-xs text-slate-400 ml-2">({item.category})</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className={`text-xs font-black px-2.5 py-0.5 rounded-full ${item.statusColor}`}>
+                                    <span className={`font-pixel text-[9px] px-2 py-0.5 rounded border ${item.statusColor}`}>
                                         {item.status}
                                     </span>
-                                    <span className="text-sm font-black text-purple-900">%{item.accuracy}</span>
+                                    <span className="font-pixel text-xs text-yellow-300">%{item.accuracy}</span>
                                 </div>
                             </div>
 
-                            <ProgressBar
-                                value={item.accuracy}
-                                colorClass={item.accuracy >= 85 ? 'bg-emerald-500' : 'bg-amber-500'}
-                                height="h-2.5"
-                                showPercent={false}
-                            />
+                            <div className="w-full bg-slate-900 h-2.5 rounded border border-slate-700 overflow-hidden">
+                                <div className={`h-full ${item.barColor}`} style={{ width: `${item.accuracy}%` }} />
+                            </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs pt-2 text-gray-600">
-                                <div className="bg-rose-50/80 p-2.5 rounded-xl border border-rose-100 text-rose-900">
-                                    <span className="font-bold block mb-0.5">⚠️ Tespit Edilen Eğilim:</span>
-                                    {item.detectedErrors}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs pt-1">
+                                <div className="bg-rose-950/40 p-2.5 rounded-lg border border-rose-900/60 text-rose-200">
+                                    <span className="font-pixel text-[9px] text-rose-400 block mb-1">⚠️ TESPİT EDİLEN EĞİLİM:</span>
+                                    <p className="font-arcade text-xs">{item.detectedErrors}</p>
                                 </div>
-                                <div className="bg-emerald-50/80 p-2.5 rounded-xl border border-emerald-100 text-emerald-900">
-                                    <span className="font-bold block mb-0.5">💡 Uzman Egzersiz Tavsiyesi:</span>
-                                    {item.recommendation}
+                                <div className="bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-900/60 text-emerald-200">
+                                    <span className="font-pixel text-[9px] text-emerald-400 block mb-1">💡 UZMAN TAVSİYESİ:</span>
+                                    <p className="font-arcade text-xs">{item.recommendation}</p>
                                 </div>
                             </div>
                         </div>
@@ -178,31 +175,20 @@ export default function VeliPaneliPage() {
                 </div>
             </div>
 
-            {/* Home Exercises for Parents */}
-            <div className="card p-6">
-                <h2 className="text-lg font-black text-purple-900 mb-4 flex items-center gap-2">
-                    <Lightbulb size={20} className="text-amber-500" />
-                    <span>Evde Uygulanabilecek Konuşma Egzersizleri</span>
+            {/* Home Exercises */}
+            <div className="pixel-box p-5 rounded-2xl bg-slate-900 border-slate-700">
+                <h2 className="font-pixel text-xs md:text-sm text-yellow-300 mb-3 flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <Lightbulb size={16} />
+                    <span>EVDE UYGULANABİLECEK KONUŞMA OYUNLARI</span>
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {homeTips.map((tip, i) => (
-                        <div key={i} className="p-4 rounded-2xl bg-purple-50/50 border border-purple-100 flex flex-col">
-                            <h3 className="font-black text-sm text-purple-900 mb-1.5">{tip.title}</h3>
-                            <p className="text-xs text-gray-600 leading-relaxed font-semibold">{tip.desc}</p>
+                        <div key={i} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex flex-col">
+                            <h3 className="font-pixel text-[10px] text-yellow-300 mb-1.5">{tip.title}</h3>
+                            <p className="font-arcade text-xs text-slate-300 leading-relaxed">{tip.desc}</p>
                         </div>
                     ))}
-                </div>
-            </div>
-
-            {/* Therapist Note Footer */}
-            <div className="card-glass p-5 border-l-4 border-l-purple-600 flex items-start gap-3">
-                <span className="text-2xl">👩‍⚕️</span>
-                <div className="text-xs text-gray-600 space-y-1">
-                    <p className="font-black text-purple-900 text-sm">Uzman Notu</p>
-                    <p>
-                        Bu web uygulaması, çocukların konuşma gelişimini desteklemek ve evde düzenli pratik yapmalarını sağlamak amacıyla oyunlaştırılmış egzersizler sunar. Ciddi konuşma ve dil bozukluklarında bir Dil ve Konuşma Terapistinin (DKT) birebir klinik değerlendirmesi esastır.
-                    </p>
                 </div>
             </div>
         </div>

@@ -1,9 +1,9 @@
-// app/panel/oyunlar/sesli-masal/page.tsx — 4. Oyun: Sesli Hikaye Okuma
+// app/panel/oyunlar/sesli-masal/page.tsx — 4. Oyun: Sesli Masal (Retro Hikaye Modu)
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Volume2, Play, Pause, ChevronLeft, ChevronRight, Mic, CheckCircle2, BookOpen } from 'lucide-react';
+import { ArrowLeft, Volume2, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import PraiseOverlay from '@/components/game/PraiseOverlay';
 import Character from '@/components/game/Character';
 import MicrophoneButton from '@/components/speech/MicrophoneButton';
@@ -28,7 +28,6 @@ export default function SesliMasalPage() {
     const [readSentences, setReadSentences] = useState<number[]>([]);
 
     const currentStory = stories[storyIndex];
-    // Split story text into clean sentences
     const sentences = currentStory.metin
         .split(/(?<=[.!?])\s+/)
         .map(s => s.trim())
@@ -69,7 +68,7 @@ export default function SesliMasalPage() {
         }
     };
 
-    // Analyze spoken speech against active sentence
+    // Analyze spoken speech
     useEffect(() => {
         if (!transcript || isListening) return;
 
@@ -81,7 +80,6 @@ export default function SesliMasalPage() {
             if (sentenceIndex + 1 < sentences.length) {
                 setSentenceIndex(i => i + 1);
             } else {
-                // Completed whole story!
                 const earned = 3;
                 setStars(earned);
                 setShowPraise(true);
@@ -109,15 +107,15 @@ export default function SesliMasalPage() {
     };
 
     return (
-        <main className="min-h-screen bg-game p-4 md:p-8 flex flex-col max-w-4xl mx-auto">
+        <main className="w-full min-h-screen bg-slate-950 pt-2 md:pt-4 px-4 md:px-6 pb-4 flex flex-col max-w-4xl mx-auto select-none">
             {/* Top Navigation */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4 border-b-2 border-slate-800 pb-3">
                 <Link
                     href="/panel/oyunlar"
-                    className="flex items-center gap-2 text-purple-700 font-bold bg-white/80 px-4 py-2 rounded-2xl shadow-sm hover:bg-white transition-all"
+                    className="pixel-btn bg-slate-800 hover:bg-slate-700 text-cyan-400 py-2 px-3 text-xs flex items-center gap-1.5"
                 >
-                    <ArrowLeft size={18} />
-                    <span>Oyunlar</span>
+                    <ArrowLeft size={14} />
+                    <span>GERİ</span>
                 </Link>
 
                 {/* Story Selector Pills */}
@@ -126,123 +124,127 @@ export default function SesliMasalPage() {
                         <button
                             key={s.id}
                             onClick={() => setStoryIndex(idx)}
-                            className={`px-3 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap transition-all ${
+                            className={`font-pixel text-[9px] px-2.5 py-1.5 rounded-lg border-2 transition-all whitespace-nowrap ${
                                 storyIndex === idx
-                                    ? 'bg-purple-600 text-white shadow-sm'
-                                    : 'bg-white/80 text-purple-700 hover:bg-white'
+                                    ? 'bg-yellow-400 text-slate-950 border-yellow-300 font-bold shadow-sm'
+                                    : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-white'
                             }`}
                         >
-                            {s.emoji} {s.baslik}
+                            {s.emoji} {s.baslik.toUpperCase()}
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Story Card */}
+            {/* Retro 16-Bit RPG Story Book Card */}
             <motion.div
                 key={currentStory.id}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="card-glass mb-6 p-6 md:p-8 shadow-xl relative"
+                className="relative pixel-box bg-slate-900 border-yellow-400 p-5 md:p-6 rounded-2xl mb-4 overflow-hidden"
             >
-                {/* Header */}
-                <div className="flex items-center justify-between border-b border-purple-100 pb-4 mb-6">
-                    <div className="flex items-center gap-3">
-                        <span className="text-4xl">{currentStory.emoji}</span>
-                        <div>
-                            <h1 className="text-2xl font-black text-purple-900">{currentStory.baslik}</h1>
-                            <p className="text-xs text-gray-400 font-bold">
-                                Cümle {sentenceIndex + 1} / {sentences.length}
-                            </p>
-                        </div>
-                    </div>
+                <div className="retro-lake-scene absolute inset-0 pointer-events-none z-0 opacity-30" aria-hidden="true" />
 
-                    <div className="flex items-center gap-2">
+                <div className="relative z-10">
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b-2 border-slate-800 pb-3 mb-4">
+                        <div className="flex items-center gap-3">
+                            <span className="text-3xl">{currentStory.emoji}</span>
+                            <div>
+                                <h1 className="font-pixel text-base md:text-lg text-yellow-300">
+                                    {currentStory.baslik.toUpperCase()}
+                                </h1>
+                                <p className="font-arcade text-[11px] text-slate-400">
+                                    CÜMLE {sentenceIndex + 1} / {sentences.length}
+                                </p>
+                            </div>
+                        </div>
+
                         <button
                             onClick={handleReadAll}
-                            className="btn-secondary text-xs py-2 px-3 flex items-center gap-1.5"
+                            className="pixel-btn bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-3 text-[10px] flex items-center gap-1.5"
                         >
-                            <Volume2 size={16} />
-                            <span>Tümünü Dinle</span>
+                            <Volume2 size={14} />
+                            <span>TÜMÜNÜ DİNLE</span>
+                        </button>
+                    </div>
+
+                    {/* Story Sentences Display with Karaoke Highlight */}
+                    <div className="space-y-2.5 mb-5 max-h-[300px] overflow-y-auto pr-1">
+                        {sentences.map((sent, idx) => {
+                            const isActive = idx === sentenceIndex;
+                            const isDone = readSentences.includes(idx);
+                            return (
+                                <motion.div
+                                    key={idx}
+                                    onClick={() => setSentenceIndex(idx)}
+                                    className={`p-3.5 rounded-xl cursor-pointer transition-all border-2 ${
+                                        isActive
+                                            ? 'bg-slate-800 border-yellow-400 shadow-[3px_3px_0px_#000]'
+                                            : isDone
+                                            ? 'bg-emerald-950/40 border-emerald-600 text-emerald-200'
+                                            : 'bg-slate-950/60 border-slate-800 hover:border-slate-600 text-slate-300'
+                                    }`}
+                                >
+                                    <div className="flex items-start gap-2.5">
+                                        <span className="font-pixel text-[10px] text-yellow-400 mt-0.5">
+                                            {idx + 1}.
+                                        </span>
+                                        <p
+                                            className={`flex-1 text-sm md:text-base leading-relaxed ${
+                                                isActive
+                                                    ? 'font-bold text-yellow-200'
+                                                    : isDone
+                                                    ? 'text-emerald-200'
+                                                    : 'text-slate-300'
+                                            }`}
+                                        >
+                                            {sent}
+                                        </p>
+                                        {isDone && (
+                                            <CheckCircle2 size={18} className="text-emerald-400 shrink-0 mt-0.5" />
+                                        )}
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Sentence Audio & Progress Controls */}
+                    <div className="flex items-center justify-between pt-3 border-t-2 border-slate-800">
+                        <button
+                            onClick={handlePrevSentence}
+                            disabled={sentenceIndex === 0}
+                            className="pixel-btn bg-slate-800 text-slate-300 py-2 px-3 text-[10px] disabled:opacity-30"
+                        >
+                            <ChevronLeft size={14} />
+                            <span>ÖNCEKİ</span>
+                        </button>
+
+                        <button
+                            onClick={handleReadActive}
+                            className="pixel-btn bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-2 px-4 text-[10px] flex items-center gap-1.5"
+                        >
+                            <Volume2 size={14} />
+                            <span>{isSpeaking ? 'DURDUR' : 'BU CÜMLEYİ DİNLE'}</span>
+                        </button>
+
+                        <button
+                            onClick={handleNextSentence}
+                            className="pixel-btn bg-slate-800 text-slate-300 py-2 px-3 text-[10px]"
+                        >
+                            <span>SONRAKİ</span>
+                            <ChevronRight size={14} />
                         </button>
                     </div>
                 </div>
-
-                {/* Story Sentences Display with Active Highlight */}
-                <div className="space-y-3 mb-6">
-                    {sentences.map((sent, idx) => {
-                        const isActive = idx === sentenceIndex;
-                        const isDone = readSentences.includes(idx);
-                        return (
-                            <motion.div
-                                key={idx}
-                                onClick={() => setSentenceIndex(idx)}
-                                className={`p-4 rounded-2xl cursor-pointer transition-all border-2 ${
-                                    isActive
-                                        ? 'bg-purple-50/90 border-purple-400 shadow-md shadow-purple-100 scale-[1.01]'
-                                        : isDone
-                                        ? 'bg-emerald-50/50 border-emerald-200 text-gray-700'
-                                        : 'bg-white/50 border-transparent hover:bg-white text-gray-600'
-                                }`}
-                            >
-                                <div className="flex items-start gap-3">
-                                    <span className="font-bold text-xs mt-1 w-5 text-purple-400">
-                                        {idx + 1}.
-                                    </span>
-                                    <p
-                                        className={`flex-1 text-base md:text-lg leading-relaxed ${
-                                            isActive
-                                                ? 'font-black text-purple-950'
-                                                : isDone
-                                                ? 'font-bold text-emerald-900'
-                                                : 'font-semibold'
-                                        }`}
-                                    >
-                                        {sent}
-                                    </p>
-                                    {isDone && (
-                                        <CheckCircle2 size={20} className="text-emerald-500 shrink-0 mt-0.5" />
-                                    )}
-                                </div>
-                            </motion.div>
-                        );
-                    })}
-                </div>
-
-                {/* Sentence Audio & Progress Controls */}
-                <div className="flex items-center justify-between pt-4 border-t border-purple-100">
-                    <button
-                        onClick={handlePrevSentence}
-                        disabled={sentenceIndex === 0}
-                        className="btn-secondary text-sm py-2 px-3 disabled:opacity-40"
-                    >
-                        <ChevronLeft size={18} />
-                        <span>Önceki</span>
-                    </button>
-
-                    <button
-                        onClick={handleReadActive}
-                        className="btn-primary text-sm py-2.5 px-5 flex items-center gap-2"
-                    >
-                        <Volume2 size={18} />
-                        <span>{isSpeaking ? 'Durdur' : 'Bu Cümleyi Dinle'}</span>
-                    </button>
-
-                    <button
-                        onClick={handleNextSentence}
-                        className="btn-secondary text-sm py-2 px-3"
-                    >
-                        <span>Sonraki</span>
-                        <ChevronRight size={18} />
-                    </button>
-                </div>
             </motion.div>
 
-            {/* Read Along Voice Practice */}
-            <div className="card flex flex-col items-center gap-3 p-6 text-center">
-                <Character mood={isListening ? 'speaking' : 'happy'} size={60} />
-                <p className="text-sm font-bold text-gray-600">
-                    Şimdi sırası gelen cümleyi yüksek sesle sen oku!
+            {/* Read Along Voice Practice HUD */}
+            <div className="pixel-box p-4 rounded-xl flex flex-col items-center gap-3">
+                <Character mood={isListening ? 'speaking' : 'happy'} size={56} showLilypad={true} />
+                <p className="font-pixel text-[10px] text-slate-400 text-center">
+                    CÜMLEYİ YÜKSEK SESLE SEN OKU!
                 </p>
 
                 <SpeechVisualizer isActive={isListening} level={level} bars={9} />
@@ -254,17 +256,17 @@ export default function SesliMasalPage() {
                 />
 
                 {transcript && (
-                    <div className="bg-purple-50 text-purple-900 font-bold px-4 py-2 rounded-xl text-sm">
+                    <div className="bg-slate-900 border border-yellow-400 text-yellow-300 font-pixel text-[11px] px-3.5 py-2 rounded-lg">
                         &quot;{transcript}&quot;
                     </div>
                 )}
             </div>
 
-            {/* Praise Overlay */}
             <PraiseOverlay
                 isOpen={showPraise}
                 stars={stars}
                 score={100}
+                message="MASAL BAŞARIYLA TAMAMLANDI! 📖✨"
                 onNext={() => {
                     setShowPraise(false);
                     setStoryIndex(i => (i + 1) % stories.length);

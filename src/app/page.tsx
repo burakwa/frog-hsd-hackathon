@@ -1,116 +1,118 @@
-// app/page.tsx — Landing / Welcome screen
+// app/page.tsx — Retro Arcade Title & Welcome Screen
 'use client';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Mic, Star, Trophy, Heart } from 'lucide-react';
+import { Play, Sparkles } from 'lucide-react';
 import Character from '@/components/game/Character';
-
-const features = [
-    { icon: Mic, label: 'Sesli Oyunlar', color: 'bg-purple-100 text-purple-600' },
-    { icon: Star, label: '3 Yıldız Sistemi', color: 'bg-yellow-100 text-yellow-600' },
-    { icon: Trophy, label: 'Rozetler', color: 'bg-green-100 text-green-600' },
-    { icon: Heart, label: '100% Ücretsiz', color: 'bg-pink-100 text-pink-600' },
-];
 
 export default function LandingPage() {
     return (
-        <main className="bg-app min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden">
-            {/* Background blobs */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-200 rounded-full opacity-30 blur-3xl" />
-                <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-200 rounded-full opacity-30 blur-3xl" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-yellow-100 rounded-full opacity-40 blur-3xl" />
+        <main className="relative min-h-screen flex flex-col items-center justify-between pt-2 md:pt-4 px-4 md:px-6 pb-4 overflow-x-clip bg-slate-950 scanlines select-none">
+            <div className="retro-scene absolute inset-0 pointer-events-none z-0" aria-hidden="true">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-slate-950/55" />
             </div>
 
-            <div className="relative z-10 max-w-md w-full text-center">
-                {/* Mascot */}
+            {/* Drifting Clouds */}
+            <div className="absolute top-4 inset-x-0 h-40 pointer-events-none z-0 overflow-hidden opacity-60">
+                <div className="pixel-cloud pixel-cloud-one" />
+                <div className="pixel-cloud pixel-cloud-two" />
+                <div className="pixel-cloud pixel-cloud-three" />
+            </div>
+
+            {/* Retro Arcade Top HUD Banner */}
+            <header className="relative z-10 w-full max-w-4xl flex items-center justify-between text-xs md:text-sm font-pixel text-yellow-400 py-2 border-b-2 border-yellow-400/30">
+                <div className="flex items-center gap-2">
+                    <span className="text-red-500 animate-pulse">1UP</span>
+                    <span className="text-white">004200</span>
+                </div>
+                <div className="hidden sm:flex items-center gap-2">
+                    <span className="text-cyan-400">HIGH SCORE</span>
+                    <span className="text-white">099900</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-emerald-400">CREDIT</span>
+                    <span className="text-emerald-300">FREE PLAY</span>
+                </div>
+            </header>
+
+            {/* Central Arcade Hero Content */}
+            <div className="relative z-10 flex flex-col items-center text-center my-auto max-w-lg w-full">
+                {/* Floating Animated Flies */}
                 <motion.div
-                    initial={{ scale: 0, rotate: -20 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: 'spring', bounce: 0.6, delay: 0.1 }}
-                    className="mb-4 flex justify-center"
+                    animate={{ y: [-8, 8, -8], x: [-6, 6, -6] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute -top-8 -left-2 sm:-left-8 md:-left-16 text-2xl sm:text-3xl fly-float pointer-events-none"
                 >
-                    <Character mood="excited" size={120} />
+                    <span aria-hidden="true">🪰</span>
                 </motion.div>
 
-                {/* Title */}
                 <motion.div
-                    initial={{ y: 30, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
+                    animate={{ y: [8, -8, 8], x: [6, -6, 6] }}
+                    transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute -top-6 -right-2 sm:-right-8 md:-right-16 text-2xl sm:text-3xl fly-float-reverse pointer-events-none"
                 >
-                    <h1 className="text-5xl font-black text-purple-800 leading-tight mb-2">
-                        Konuşma<br />
-                        <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-                            Oyunu
-                        </span>
-                    </h1>
-                    <p className="text-gray-500 font-semibold text-lg mb-6">
-                        Kurbağa ile eğlenerek konuşmayı öğren! 🎤
-                    </p>
+                    <span aria-hidden="true">🪰</span>
                 </motion.div>
 
-                {/* Feature pills */}
+                {/* Game Logo */}
                 <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="flex flex-wrap justify-center gap-2 mb-8"
+                    initial={{ scale: 0.8, y: -20, opacity: 0 }}
+                    animate={{ scale: 1, y: 0, opacity: 1 }}
+                    transition={{ type: 'spring', bounce: 0.5 }}
+                    className="mb-3 flex items-center gap-3 border-y-4 border-yellow-400/70 bg-slate-950/75 px-5 py-3 shadow-[4px_4px_0_#000]"
                 >
-                    {features.map(({ icon: Icon, label, color }) => (
-                        <div key={label} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold ${color}`}>
-                            <Icon size={14} />
-                            {label}
-                        </div>
-                    ))}
+                    <span className="text-4xl md:text-5xl" aria-hidden="true">🐸</span>
+                    <span className="font-pixel text-left text-base sm:text-lg md:text-xl leading-relaxed text-yellow-300">
+                        FROG<br /><span className="text-cyan-300">ARCADE</span>
+                    </span>
                 </motion.div>
 
-                {/* CTA Buttons */}
-                <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.7 }}
-                    className="flex flex-col gap-3"
-                >
-                    <Link href="/giris">
-                        <motion.div
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            className="btn-primary w-full py-4 text-lg justify-center"
-                        >
-                            🚀 Hemen Oyna!
-                        </motion.div>
+                {/* Subtitle */}
+                <p className="font-arcade text-base md:text-lg text-emerald-400 font-bold mb-6 tracking-wide drop-shadow-md">
+                    ★ 2D RETRO KONUŞMA TERAPİSİ OYUNU ★
+                </p>
+
+                {/* Mascot on Lilypad */}
+                <div className="mb-6 flex flex-col items-center">
+                    <Character mood="happy" size={100} showLilypad={true} />
+                </div>
+
+                {/* Retro Arcade CTA Buttons */}
+                <div className="flex flex-col gap-3.5 w-full max-w-xs">
+                    <Link href="/giris" className="w-full">
+                        <button className="pixel-btn w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-3.5 text-sm md:text-base flex items-center justify-center gap-3">
+                            <Play size={18} className="fill-slate-950" />
+                            <span>OYUNA BAŞLA</span>
+                        </button>
                     </Link>
-                    <Link href="/kayit">
-                        <motion.div
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            className="btn-secondary w-full py-4 text-lg justify-center"
-                        >
-                            ✨ Ücretsiz Kayıt Ol
-                        </motion.div>
-                    </Link>
-                </motion.div>
 
-                {/* Guest link */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1 }}
-                    className="mt-4"
-                >
+                    <Link href="/kayit" className="w-full">
+                        <button className="pixel-btn w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 text-xs md:text-sm flex items-center justify-center gap-2">
+                            <Sparkles size={16} />
+                            <span>ÜCRETSİZ KAYIT OL</span>
+                        </button>
+                    </Link>
+
                     <Link
                         href="/panel"
-                        className="text-sm text-gray-400 hover:text-purple-500 font-semibold transition-colors"
+                        className="font-pixel text-[11px] text-amber-300 hover:text-amber-100 mt-2 transition-colors flex items-center justify-center gap-1.5"
                     >
-                        Misafir olarak devam et →
+                        <span>▶ MİSAFİR MODUNDA OYNA</span>
                     </Link>
-                </motion.div>
-
-                {/* Decorative stars */}
-                <div className="absolute top-8 right-8 text-3xl animate-bounce">⭐</div>
-                <div className="absolute top-20 left-6 text-2xl" style={{ animation: 'frog-idle 2.5s ease-in-out infinite' }}>🌟</div>
+                </div>
             </div>
+
+            {/* Bottom Retro Info Bar */}
+            <footer className="relative z-10 w-full max-w-4xl flex flex-wrap items-center justify-between text-[11px] font-pixel text-slate-400 pt-4 border-t-2 border-slate-800 gap-2">
+                <div className="flex items-center gap-3">
+                    <span className="text-emerald-400">🐸 4 EĞLENCELİ RETRO OYUN</span>
+                    <span>•</span>
+                    <span className="text-yellow-400">🎤 CANLI MİKROFON ANALİZİ</span>
+                </div>
+                <div className="text-slate-500">
+                    © 2026 KONUŞMA OYUNU
+                </div>
+            </footer>
         </main>
     );
 }
