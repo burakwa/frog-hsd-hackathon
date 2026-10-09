@@ -130,7 +130,7 @@ export default function SesliMasalPage() {
                             onClick={() => setStoryIndex(idx)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-rounded text-sm whitespace-nowrap transition-all ${
                                 storyIndex === idx
-                                    ? 'bg-purple-600 text-white shadow-lg'
+                                    ? 'bg-green-600 text-white shadow-lg'
                                     : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-gray-100'
                             }`}
                         >
@@ -149,14 +149,14 @@ export default function SesliMasalPage() {
                 className="card card-elevated p-6 md:p-8 relative overflow-hidden"
             >
                 {/* Background decoration */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-purple-100/50 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-pink-100/50 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-green-100/50 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-100/50 rounded-full blur-3xl" />
 
                 <div className="relative z-10">
                     {/* Header */}
                     <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center">
+                            <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center">
                                 <span className="text-2xl">{currentStory.emoji}</span>
                             </div>
                             <div>
@@ -188,7 +188,7 @@ export default function SesliMasalPage() {
                                     transition={{ delay: idx * 0.05 }}
                                     className={`p-4 rounded-xl cursor-pointer transition-all border-2 ${
                                         isActive
-                                            ? 'bg-purple-50 border-purple-300 shadow-lg'
+                                            ? 'bg-green-50 border-green-300 shadow-lg'
                                             : isDone
                                             ? 'bg-green-50 border-green-200 text-green-700'
                                             : 'bg-white border-gray-100 hover:border-gray-200 hover:bg-gray-50 text-gray-700'
@@ -196,7 +196,7 @@ export default function SesliMasalPage() {
                                 >
                                     <div className="flex items-start gap-3">
                                         <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-fun text-xs mt-0.5 ${
-                                            isActive ? 'bg-purple-500 text-white' :
+                                            isActive ? 'bg-green-500 text-white' :
                                             isDone ? 'bg-green-500 text-white' :
                                             'bg-gray-100 text-gray-400'
                                         }">
@@ -257,11 +257,11 @@ export default function SesliMasalPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="card card-colored-purple p-6"
+                className="card card-colored-green p-6"
             >
                 <div className="flex flex-col items-center gap-4 text-center">
                     <Character mood={isListening ? 'speaking' : 'happy'} size={70} showLilypad={true} />
-                    <p className="font-fun text-lg text-purple-800">Cümleyi Yüksek Sesle Sen Oku! 📖</p>
+                    <p className="font-fun text-lg text-green-800">Cümleyi Yüksek Sesle Sen Oku! 📖</p>
 
                     <div className="w-full max-w-md">
                         <SpeechVisualizer isActive={isListening} level={level} bars={9} />
@@ -277,9 +277,9 @@ export default function SesliMasalPage() {
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="p-3 bg-white/50 border border-purple-200 rounded-xl text-center"
+                            className="p-3 bg-white/50 border border-green-200 rounded-xl text-center"
                         >
-                            <span className="font-mono text-purple-800">"{transcript}"</span>
+                            <span className="font-mono text-green-800">"{transcript}"</span>
                         </motion.div>
                     )}
                 </div>

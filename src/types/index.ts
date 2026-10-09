@@ -39,7 +39,7 @@ export interface UserProfile {
     id: string;
     ad: string;
     yas: number;
-    avatar: 'kurbaga' | 'panda' | 'tavsan';
+    avatar: string; // DiceBear seed or legacy 'kurbaga' | 'panda' | 'tavsan'
     toplam_yildiz: number;
     seviye: number;
     created_at: string;

@@ -133,7 +133,7 @@ export default function CumleSoylePage() {
                     <ArrowLeft className="w-4 h-4" />
                     Geri
                 </Link>
-                <div className="badge badge-blue">
+                <div className="badge badge-emerald">
                     QUEST {exerciseIndex + 1} / {sentences.length}
                 </div>
             </motion.div>
@@ -146,8 +146,8 @@ export default function CumleSoylePage() {
                 className="card card-elevated p-6 md:p-8 relative overflow-hidden"
             >
                 {/* Background decoration */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-100/50 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-green-100/50 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-100/50 rounded-full blur-3xl" />
 
                 <div className="relative z-10 flex flex-col items-center text-center">
                     {/* Frog */}
@@ -239,10 +239,10 @@ export default function CumleSoylePage() {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-center"
+                        className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-center"
                     >
-                        <span className="font-fun text-sm text-blue-700">Duyulan: </span>
-                        <span className="font-mono text-blue-800">"{transcript}"</span>
+                        <span className="font-fun text-sm text-green-700">Duyulan: </span>
+                        <span className="font-mono text-green-800">"{transcript}"</span>
                     </motion.div>
                 )}
 

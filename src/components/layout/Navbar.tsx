@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Home, Gamepad2, TrendingUp, User, ShieldCheck, Menu, X, Star } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useProgress } from '@/hooks/useProgress';
 
 const navItems = [
     { href: '/panel', icon: Home, label: 'Ana Sayfa' },
@@ -18,12 +19,8 @@ const navItems = [
 export default function Navbar() {
     const pathname = usePathname();
     const { user, signOut } = useAuth();
+    const { totalStars } = useProgress();
     const [mobileOpen, setMobileOpen] = useState(false);
-
-    const handleSignOut = async () => {
-        await signOut();
-        setMobileOpen(false);
-    };
 
     return (
         <header className="relative z-20 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0">
@@ -64,10 +61,10 @@ export default function Navbar() {
                                 {/* Stars display */}
                                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 rounded-xl">
                                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                                    <span className="font-fun text-green-700">0</span>
+                                    <span className="font-fun text-green-700">{totalStars}</span>
                                 </div>
                                 <button
-                                    onClick={handleSignOut}
+                                    onClick={signOut}
                                     className="btn btn-ghost btn-small text-red-600 hover:bg-red-50 border-red-200"
                                 >
                                     Çıkış
@@ -123,7 +120,7 @@ export default function Navbar() {
                         <div className="pt-4 border-t border-gray-100 space-y-2">
                             {user ? (
                                 <button
-                                    onClick={handleSignOut}
+                                    onClick={signOut}
                                     className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-rounded text-red-600 hover:bg-red-50 transition-colors"
                                 >
                                     <User className="w-5 h-5" />

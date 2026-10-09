@@ -168,7 +168,7 @@ export default function HeceAviPage() {
                         <Trophy className="w-3 h-3" />
                         {score} PUAN
                     </div>
-                    <div className="badge badge-blue">
+                    <div className="badge badge-emerald">
                         STAGE {exerciseIndex + 1}/{heceExercises.length}
                     </div>
                 </div>
@@ -212,7 +212,7 @@ export default function HeceAviPage() {
                 className="card card-elevated p-6 relative overflow-hidden"
             >
                 {/* Background decoration */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-green-100/50 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-green-100/50 rounded-full blur-3xl" />
 
                 {/* Flies Grid */}

@@ -14,7 +14,7 @@ interface LearningStep {
     subtitle: string;
     icon: React.ReactNode;
     href: string;
-    color: 'green' | 'emerald' | 'lime' | 'teal';
+    color: 'green' | 'emerald';
     requiredStars: number;
     gameType: 'speech' | 'syllable' | 'sentence' | 'story';
 }
@@ -46,7 +46,7 @@ const learningPath: LearningStep[] = [
         subtitle: 'Eksik kelimeleri bul, cümle oluştur',
         icon: <span className="text-3xl">📝</span>,
         href: '/panel/oyunlar/cumle-soyle',
-        color: 'lime',
+        color: 'emerald',
         requiredStars: 15,
         gameType: 'sentence',
     },
@@ -56,7 +56,7 @@ const learningPath: LearningStep[] = [
         subtitle: 'Hikayeleri oku ve dinle',
         icon: <span className="text-3xl">📖</span>,
         href: '/panel/oyunlar/sesli-masal',
-        color: 'teal',
+        color: 'green',
         requiredStars: 30,
         gameType: 'story',
     },
@@ -65,8 +65,6 @@ const learningPath: LearningStep[] = [
 const colorStyles = {
     green: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', main: 'bg-green-500', hover: 'hover:bg-green-600', iconBg: 'bg-green-100' },
     emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', main: 'bg-emerald-500', hover: 'hover:bg-emerald-600', iconBg: 'bg-emerald-100' },
-    lime: { bg: 'bg-lime-50', border: 'border-lime-200', text: 'text-lime-700', main: 'bg-lime-500', hover: 'hover:bg-lime-600', iconBg: 'bg-lime-100' },
-    teal: { bg: 'bg-teal-50', border: 'border-teal-200', text: 'text-teal-700', main: 'bg-teal-500', hover: 'hover:bg-teal-600', iconBg: 'bg-teal-100' },
 };
 
 export default function PanelPage() {
@@ -128,7 +126,7 @@ export default function PanelPage() {
                     className="flex justify-center"
                 >
                     <div className="relative w-32 h-32 md:w-40 md:h-40">
-                        <svg className="w-full h-full transform -rotate-90">
+                        <svg viewBox="0 0 128 128" className="w-full h-full transform -rotate-90">
                             <circle
                                 cx="64"
                                 cy="64"

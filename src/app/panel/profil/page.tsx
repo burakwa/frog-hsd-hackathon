@@ -1,19 +1,21 @@
-// app/panel/profil/page.tsx — Profile Settings (Bright Design)
+// app/panel/profil/page.tsx — Profile Settings with DiceBear Avatar
 'use client';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Award, Settings, Volume2, Star, Save, CheckCircle2 } from 'lucide-react';
+import { User, Award, Settings, Volume2, Star, Save, CheckCircle2, Image, Sparkles } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProgress } from '@/hooks/useProgress';
-import Character from '@/components/game/Character';
+import Character, { AvatarPicker } from '@/components/game/Character';
 import { starsToLevel } from '@/lib/utils/helpers';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilPage() {
-    const { user, profile, updateProfile } = useAuth();
+    const { user, profile, updateProfile, signOut } = useAuth();
     const { totalStars, badges } = useProgress();
+    const router = useRouter();
 
     const [nickname, setNickname] = useState('');
-    const [selectedAvatar, setSelectedAvatar] = useState<'kurbaga' | 'panda' | 'tavsan'>('kurbaga');
+    const [avatarSeed, setAvatarSeed] = useState<string>('frog-friend');
     const [age, setAge] = useState(6);
     const [speechRate, setSpeechRate] = useState<'slow' | 'normal' | 'fast'>('normal');
     const [savedMsg, setSavedMsg] = useState(false);
@@ -29,10 +31,10 @@ export default function ProfilPage() {
         }
 
         if (profile?.avatar) {
-            setSelectedAvatar(profile.avatar);
+            setAvatarSeed(profile.avatar);
         } else if (typeof window !== 'undefined') {
-            const storedAvatar = localStorage.getItem('frog_player_avatar');
-            if (storedAvatar) setSelectedAvatar(storedAvatar as any);
+            const storedAvatar = localStorage.getItem('frog_player_avatar_seed');
+            if (storedAvatar) setAvatarSeed(storedAvatar);
         }
 
         if (profile?.yas) {
@@ -48,7 +50,7 @@ export default function ProfilPage() {
         // Save to localStorage immediately
         if (typeof window !== 'undefined') {
             localStorage.setItem('frog_player_name', nickname);
-            localStorage.setItem('frog_player_avatar', selectedAvatar);
+            localStorage.setItem('frog_player_avatar_seed', avatarSeed);
         }
 
         // Save to Supabase if authenticated
@@ -56,7 +58,7 @@ export default function ProfilPage() {
             try {
                 await updateProfile({
                     ad: nickname,
-                    avatar: selectedAvatar,
+                    avatar: avatarSeed, // Store DiceBear seed
                     yas: age,
                 });
             } catch {
@@ -67,6 +69,12 @@ export default function ProfilPage() {
         setSavedMsg(true);
         setSaving(false);
         setTimeout(() => setSavedMsg(false), 3000);
+    };
+
+    const handleLogout = async () => {
+        await signOut();
+        // Redirect to home page (before login)
+        router.push('/');
     };
 
     const level = starsToLevel(totalStars);
@@ -101,10 +109,10 @@ export default function ProfilPage() {
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-100/50 rounded-full blur-3xl" />
 
                 <div className="relative flex flex-col sm:flex-row items-center gap-6">
-                    {/* Avatar */}
+                    {/* Avatar with DiceBear */}
                     <div className="relative shrink-0">
                         <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-white border-4 border-green-200 shadow-xl p-3 flex items-center justify-center">
-                            <Character mood="excited" size={100} showLilypad={true} />
+                            <Character mood="excited" size={100} showLilypad={true} avatar={avatarSeed} />
                         </div>
                         <div className="absolute -bottom-2 -right-2 bg-green-500 border-3 border-white text-white font-fun text-xs px-3 py-1 rounded-full shadow-lg">
                             LVL {level}
@@ -178,33 +186,22 @@ export default function ProfilPage() {
                     </div>
                 </div>
 
-                {/* Mascot Selection */}
+                {/* DiceBear Avatar Picker */}
                 <div>
                     <label className="font-rounded text-sm text-gray-700 mb-3 block flex items-center gap-2">
-                        <Star className="w-4 h-4 text-yellow-500" />
-                        Favori Maskot
+                        <Image className="w-4 h-4 text-green-600" />
+                        Profil Resmi (DiceBear)
                     </label>
-                    <div className="grid grid-cols-3 gap-3">
-                        {[
-                            { id: 'kurbaga', name: 'KURBAĞA', emoji: '🐸' },
-                            { id: 'panda', name: 'PANDA', emoji: '🐼' },
-                            { id: 'tavsan', name: 'TAVŞAN', emoji: '🐰' },
-                        ].map(av => (
-                            <button
-                                type="button"
-                                key={av.id}
-                                onClick={() => setSelectedAvatar(av.id as any)}
-                                className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${
-                                    selectedAvatar === av.id
-                                        ? 'border-green-400 bg-green-50 shadow-lg scale-[1.02]'
-                                        : 'border-gray-200 bg-white hover:border-green-300 hover:shadow-md'
-                                }`}
-                            >
-                                <span className="text-4xl" aria-hidden="true">{av.emoji}</span>
-                                <span className="font-rounded text-sm text-gray-700">{av.name}</span>
-                            </button>
-                        ))}
-                    </div>
+                    <p className="text-xs text-gray-500 mb-3">Bottts stilinde yeşil temalı karakter oluştur</p>
+                    <AvatarPicker
+                        onSelect={setAvatarSeed}
+                        currentSeed={avatarSeed}
+                        size={100}
+                        style="bottts"
+                    />
+                    <p className="text-xs text-gray-400 mt-2">
+                        Seçili: <code className="bg-gray-100 px-1.5 py-0.5 rounded">{avatarSeed}</code>
+                    </p>
                 </div>
 
                 {/* Speech Rate */}
@@ -234,6 +231,49 @@ export default function ProfilPage() {
                             </button>
                         ))}
                     </div>
+                </div>
+
+                {/* Account Actions */}
+                <div className="pt-4 border-t border-gray-100 space-y-3">
+                    <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-100">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                                <Sparkles className="w-5 h-5 text-green-600" />
+                            </div>
+                            <div>
+                                <p className="font-fun text-sm text-green-800">Profil Resmini Oluştur</p>
+                                <p className="text-xs text-green-600">DiceBear API ile benzersiz avatar</p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setAvatarSeed(
+                                ['happy', 'green', 'jumpy', 'smart', 'kind', 'brave', 'calm', 'bright'][
+                                    Math.floor(Math.random() * 8)
+                                ] + '-' + 
+                                ['frog', 'toad', 'leaf', 'pond', 'reed', 'lily', 'moss', 'fern'][
+                                    Math.floor(Math.random() * 8)
+                                ] + '-' + Math.floor(Math.random() * 1000)
+                            )}
+                            className="btn btn-secondary text-sm"
+                        >
+                            <Sparkles className="w-4 h-4 mr-1" />
+                            Rastgele Oluştur
+                        </button>
+                    </div>
+
+                    {user && (
+                        <div className="pt-4 border-t border-gray-100">
+                            <button
+                                type="button"
+                                onClick={handleLogout}
+                                className="w-full btn btn-ghost text-red-600 hover:bg-red-50 border-red-100"
+                            >
+                                <User className="w-4 h-4 mr-2" />
+                                Çıkış Yap
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Save Button */}
