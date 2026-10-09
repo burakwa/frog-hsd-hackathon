@@ -1,4 +1,4 @@
-// app/panel/oyunlar/hece-avi/page.tsx — 2. Oyun: Hece Avı (Retro 2D Sinek Yakalama)
+// app/panel/oyunlar/hece-avi/page.tsx — Hece Avı Oyunu
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -28,7 +28,6 @@ interface FlyTarget {
     word: string;
     isCorrect: boolean;
     popped: boolean;
-    sprite: string;
 }
 
 export default function HeceAviPage() {
@@ -60,14 +59,12 @@ export default function HeceAviPage() {
                 word: w,
                 isCorrect: true,
                 popped: false,
-                sprite: '🪰',
             })),
             ...wrongs.map((w, idx) => ({
                 id: `w-${idx}`,
                 word: w,
                 isCorrect: false,
                 popped: false,
-                sprite: '🪰',
             })),
         ].sort(() => 0.5 - ((currentEx.id + 1) % 2 ? 0.3 : 0.7));
 
@@ -104,11 +101,11 @@ export default function HeceAviPage() {
         speak(fly.word);
 
         if (fly.isCorrect) {
-            // Retro 8-bit gulp sound
+            // Success sound
             playChiptune(440, 'square', 0.1);
             setTimeout(() => playChiptune(880, 'triangle', 0.25), 80);
 
-            setMood('excited'); // frog3.png tongue out
+            setMood('excited');
             setFlies(prev =>
                 prev.map(item => (item.id === fly.id ? { ...item, popped: true } : item))
             );
@@ -130,7 +127,7 @@ export default function HeceAviPage() {
                 setTimeout(() => setMood('happy'), 600);
             }
         } else {
-            // Retro buzz error
+            // Error sound
             playChiptune(150, 'sawtooth', 0.3);
             setShakeFlyId(fly.id);
             setMood('sad');
@@ -151,119 +148,146 @@ export default function HeceAviPage() {
     };
 
     return (
-        <main className="w-full min-h-screen bg-slate-950 pt-2 md:pt-4 px-4 md:px-6 pb-4 flex flex-col max-w-4xl mx-auto select-none">
-            {/* Retro Top Bar */}
-            <div className="flex items-center justify-between mb-4 border-b-2 border-slate-800 pb-3">
+        <div className="max-w-4xl mx-auto space-y-6 animate-slide-up">
+            {/* Top Bar */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between"
+            >
                 <Link
                     href="/panel/oyunlar"
-                    className="pixel-btn bg-slate-800 hover:bg-slate-700 text-cyan-400 py-2 px-3 text-xs flex items-center gap-1.5"
+                    className="btn btn-ghost btn-small"
                 >
-                    <ArrowLeft size={14} />
-                    <span>GERİ</span>
+                    <ArrowLeft className="w-4 h-4" />
+                    Geri
                 </Link>
 
                 <div className="flex items-center gap-4">
-                    <div className="font-pixel text-yellow-400 text-xs md:text-sm flex items-center gap-1.5 bg-slate-900 border-2 border-yellow-400/50 px-3 py-1.5 rounded-lg shadow-sm">
-                        <Trophy size={14} />
-                        <span>{score} PTS</span>
+                    <div className="badge badge-yellow">
+                        <Trophy className="w-3 h-3" />
+                        {score} PUAN
                     </div>
-                    <div className="font-pixel text-[11px] text-cyan-300 bg-slate-900 border-2 border-cyan-400/50 px-3 py-1.5 rounded-lg">
+                    <div className="badge badge-blue">
                         STAGE {exerciseIndex + 1}/{heceExercises.length}
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
-            {/* Target Objective Card */}
-            <div className="pixel-box-green p-4 rounded-xl mb-4 flex items-center justify-between relative overflow-hidden">
-                <div className="flex items-center gap-3">
-                    <div className="relative w-12 h-12 shrink-0 flex items-center justify-center text-3xl animate-bounce" aria-hidden="true">
-                        🪰
+            {/* Target Card */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="card card-colored-green p-6"
+            >
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center animate-bounce-subtle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" className="w-7 h-7"><path d="M12 2v20M2 12h20"/></svg>
+                        </div>
+                        <div>
+                            <p className="font-rounded text-sm text-green-700 uppercase tracking-wider">Hedef Hece</p>
+                            <h2 className="font-fun text-3xl text-green-800">"{currentEx.hece.toUpperCase()}"</h2>
+                            <p className="text-green-600 text-sm mt-1">
+                                İçinde <span className="font-bold underline">{currentEx.hece}</span> hecesi olan sinekleri yakala!
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <p className="font-pixel text-[10px] text-emerald-300 uppercase tracking-wider">
-                            HEDEF HECE:
-                        </p>
-                        <h1 className="font-pixel text-xl md:text-2xl text-yellow-300 drop-shadow-md">
-                            &quot;{currentEx.hece.toUpperCase()}&quot;
-                        </h1>
-                        <p className="text-xs font-bold text-emerald-100">
-                            İçinde <span className="underline font-black text-white">{currentEx.hece}</span> hecesi olan sinekleri yakala!
-                        </p>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-3">
                     <button
                         onClick={() => speak(currentEx.hece)}
-                        className="pixel-btn bg-emerald-600 hover:bg-emerald-500 text-white p-3 text-xs"
+                        className="btn btn-primary btn-icon"
                         title="Hecenin sesini dinle"
                     >
-                        <Volume2 size={16} />
+                        <Volume2 className="w-5 h-5" />
                     </button>
                 </div>
-            </div>
+            </motion.div>
 
-            {/* 2D Retro Lake & Lilypad Game Arena */}
-            <div className="relative flex-1 rounded-2xl border-4 border-slate-700 overflow-hidden shadow-2xl flex flex-col justify-between min-h-[440px] bg-sky-950">
-                <div className="retro-lake-scene absolute inset-0 pointer-events-none z-0 opacity-80" aria-hidden="true" />
+            {/* Game Grid */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="card card-elevated p-6 relative overflow-hidden"
+            >
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-green-100/50 rounded-full blur-3xl" />
 
-                {/* Flying Target Flies Grid */}
-                <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 p-4 my-auto">
-                    {flies.map(fly => {
-                        const isShaking = shakeFlyId === fly.id;
-                        return (
-                            <motion.button
-                                key={fly.id}
-                                whileHover={{ scale: fly.popped ? 1 : 1.05 }}
-                                whileTap={{ scale: fly.popped ? 1 : 0.95 }}
-                                animate={isShaking ? { x: [-10, 10, -6, 6, 0] } : undefined}
-                                transition={isShaking ? { duration: 0.4 } : undefined}
-                                onClick={() => handleFlyClick(fly)}
-                                disabled={fly.popped}
-                                className={`group relative p-3 md:p-4 rounded-xl border-3 flex flex-col items-center justify-center transition-all cursor-pointer ${
-                                    fly.popped
-                                        ? 'bg-slate-900/60 border-slate-700 opacity-40 scale-90'
-                                        : 'bg-slate-900/85 hover:bg-slate-900 border-yellow-400/80 shadow-md shadow-yellow-900/40'
-                                }`}
-                            >
-                                {fly.popped ? (
-                                    <div className="flex flex-col items-center">
-                                        <span className="font-pixel text-[11px] text-emerald-400">YAKALANDI!</span>
-                                        <span className="font-pixel text-[9px] text-yellow-300">+50 PTS</span>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="relative w-12 h-12 md:w-14 md:h-14 mb-1 flex items-center justify-center text-3xl md:text-4xl" aria-hidden="true">
-                                            {fly.sprite}
-                                        </div>
-                                        <span className="font-pixel text-sm md:text-base text-white tracking-wide drop-shadow">
-                                            {fly.word}
-                                        </span>
-                                    </>
-                                )}
-                            </motion.button>
-                        );
-                    })}
+                {/* Flies Grid */}
+                <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {flies.map((fly, index) => (
+                        <motion.button
+                            key={fly.id}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ 
+                                opacity: 1, 
+                                scale: 1,
+                                x: shakeFlyId === fly.id ? [-8, 8, -6, 6, 0] : 0
+                            }}
+                            transition={{ delay: 0.3 + index * 0.05, duration: 0.4 }}
+                            whileHover={{ scale: fly.popped ? 1 : 1.05 }}
+                            whileTap={{ scale: fly.popped ? 1 : 0.95 }}
+                            onClick={() => handleFlyClick(fly)}
+                            disabled={fly.popped}
+                            className={`relative group p-4 rounded-2xl border-2 flex flex-col items-center justify-center transition-all cursor-pointer ${
+                                fly.popped
+                                    ? 'bg-gray-100 border-gray-200 opacity-50 scale-95'
+                                    : 'bg-white border-gray-200 hover:border-green-300 hover:shadow-lg shadow-sm'
+                            }`}
+                        >
+                            {fly.popped ? (
+                                <motion.div
+                                    initial={{ scale: 0.5 }}
+                                    animate={{ scale: 1 }}
+                                    className="flex flex-col items-center"
+                                >
+                                    <span className="font-fun text-sm text-green-600">YAKALANDI!</span>
+                                    <span className="font-fun text-xs text-yellow-600">+50 PUAN</span>
+                                </motion.div>
+                            ) : (
+                                <>
+                                    <motion.div
+                                        whileHover={{ scale: 1.1, rotate: [0, 5, -5, 0] }}
+                                        className="w-16 h-16 mb-2 flex items-center justify-center"
+                                        aria-hidden="true"
+                                    >
+                                        <svg 
+                                            viewBox="0 0 24 24" 
+                                            fill="none" 
+                                            stroke={fly.isCorrect ? "#16a34a" : "#2563eb"} 
+                                            strokeWidth="1.5" 
+                                            className="w-full h-full drop-shadow-lg"
+                                        >
+                                            <path d="M12 2v20M2 12h20"/>
+                                        </svg>
+                                    </motion.div>
+                                    <span className="font-fun text-base text-gray-800 text-center">{fly.word}</span>
+                                </>
+                            )}
+                        </motion.button>
+                    ))}
                 </div>
 
-                {/* Bottom Lilypad & Animated Frog Mascot */}
-                <div className="relative z-10 flex flex-col items-center justify-end pb-3 pointer-events-none">
-                    <Character mood={mood} size={88} showLilypad={true} />
+                {/* Frog at bottom */}
+                <div className="relative z-10 flex justify-center pt-6">
+                    <Character mood={mood} size={100} showLilypad={true} />
                 </div>
-            </div>
+            </motion.div>
 
             {/* Praise Overlay */}
             <PraiseOverlay
                 isOpen={showPraise}
                 stars={earnedStars}
                 score={score}
-                message="TÜM SİNEKLERİ YAKALADIN! 🐸✨"
+                message="TÜM SİNEKLERİ YAKALADIN! 🎉"
                 onNext={handleNextExercise}
                 onRetry={() => {
                     setShowPraise(false);
                     setExerciseIndex(i => i);
                 }}
             />
-        </main>
+        </div>
     );
 }

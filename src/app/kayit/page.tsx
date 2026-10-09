@@ -1,4 +1,4 @@
-// app/(auth)/kayit/page.tsx — Retro Kayıt Ekranı
+// app/kayit/page.tsx — Bright Register Page
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -43,125 +43,158 @@ export default function KayitPage() {
     };
 
     return (
-        <main className="min-h-dvh bg-slate-950 flex items-center justify-center pt-2 md:pt-4 px-4 md:px-6 pb-4 scanlines select-none relative overflow-x-hidden">
-            <div className="retro-scene absolute inset-0 pointer-events-none z-0 opacity-40" aria-hidden="true" />
+        <main className="page-wrapper min-h-screen flex items-center justify-center px-4 py-12 relative overflow-x-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+                <div className="absolute top-0 left-0 w-72 h-72 bg-green-100/50 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 right-0 w-72 h-72 bg-blue-100/50 rounded-full blur-3xl" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-yellow-100/30 rounded-full blur-3xl" />
+            </div>
 
             <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="pixel-box max-w-sm w-full my-3 shrink-0 sm:my-0 relative z-10 p-6 md:p-8 rounded-2xl bg-slate-900 border-yellow-400 shadow-2xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative z-10 w-full max-w-sm"
             >
-                <div className="text-center mb-6">
-                    <div className="flex justify-center mb-3">
-                        <Character mood="excited" size={68} showLilypad={true} />
+                <div className="card card-elevated p-6 md:p-8">
+                    <div className="text-center mb-8">
+                        <div className="flex justify-center mb-4">
+                            <Character mood="excited" size={80} showLilypad={true} />
+                        </div>
+                        <h1 className="font-fun text-2xl md:text-3xl text-gray-800 mb-2">Yeni Oyuncu Kaydı 🎮</h1>
+                        <p className="text-gray-600">FrogFriends ailesine katıl ve maceraya başla!</p>
                     </div>
-                    <h1 className="font-pixel text-lg md:text-xl text-yellow-300 drop-shadow">
-                        YENİ OYUNCU KAYDI 🎮
-                    </h1>
-                    <p className="font-arcade text-xs text-slate-400 mt-1">
-                        Ücretsiz hesabını aç ve maceraya başla!
-                    </p>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label className="font-rounded text-sm text-gray-700 mb-2 block">Ad Soyad</label>
+                            <div className="relative">
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                    className="input pl-12"
+                                    type="text"
+                                    placeholder="Adınızı yazın"
+                                    value={form.ad}
+                                    onChange={e => handleChange('ad', e.target.value)}
+                                    required
+                                    autoComplete="name"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="font-rounded text-sm text-gray-700 mb-2 block">E-Posta</label>
+                            <div className="relative">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                    className="input pl-12"
+                                    type="email"
+                                    placeholder="ornek@mail.com"
+                                    value={form.email}
+                                    onChange={e => handleChange('email', e.target.value)}
+                                    required
+                                    autoComplete="email"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="font-rounded text-sm text-gray-700 mb-2 block">Şifre</label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                    className="input pl-12 pr-12"
+                                    type={showPass ? 'text' : 'password'}
+                                    placeholder="En az 6 karakter"
+                                    value={form.password}
+                                    onChange={e => handleChange('password', e.target.value)}
+                                    required
+                                    autoComplete="new-password"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPass(p => !p)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                    {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="font-rounded text-sm text-gray-700 mb-2 block">Şifre Tekrar</label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                    className="input pl-12 pr-12"
+                                    type={showPass ? 'text' : 'password'}
+                                    placeholder="Şifrenizi tekrar yazın"
+                                    value={form.confirm}
+                                    onChange={e => handleChange('confirm', e.target.value)}
+                                    required
+                                    autoComplete="new-password"
+                                />
+                            </div>
+                        </div>
+
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-rounded"
+                            >
+                                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                <span>{error}</span>
+                            </motion.div>
+                        )}
+
+                        {success && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm font-rounded"
+                            >
+                                <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                                <span>{success}</span>
+                            </motion.div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="btn btn-primary w-full py-4"
+                        >
+                            {loading ? 'Kayıt Olunuyor...' : 'Hesap Oluştur'}
+                        </button>
+                    </form>
+
+                    <div className="mt-6 pt-6 border-t border-gray-100 text-center text-sm text-gray-500">
+                        <p>
+                            Zaten hesabın var mı?{' '}
+                            <Link href="/giris" className="text-green-600 hover:text-green-700 font-semibold underline underline-offset-2">
+                                Giriş Yap
+                            </Link>
+                        </p>
+                        <Link href="/" className="block mt-2 text-gray-400 hover:text-gray-600 font-rounded">
+                            ← Ana Sayfaya Dön
+                        </Link>
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
-                    <div>
-                        <label className="font-pixel text-[10px] text-cyan-300 mb-1 block">ÇOCUĞUN ADI</label>
-                        <div className="relative">
-                            <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                            <input
-                                className="input-field pl-9 text-sm"
-                                type="text"
-                                placeholder="Örn: Ali"
-                                value={form.ad}
-                                onChange={e => handleChange('ad', e.target.value)}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="font-pixel text-[10px] text-cyan-300 mb-1 block">E-POSTA</label>
-                        <div className="relative">
-                            <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                            <input
-                                className="input-field pl-9 text-sm"
-                                type="email"
-                                placeholder="veli@mail.com"
-                                value={form.email}
-                                onChange={e => handleChange('email', e.target.value)}
-                                required
-                                autoComplete="email"
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="font-pixel text-[10px] text-cyan-300 mb-1 block">ŞİFRE</label>
-                        <div className="relative">
-                            <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                            <input
-                                className="input-field pl-9 pr-10 text-sm"
-                                type={showPass ? 'text' : 'password'}
-                                placeholder="En az 6 karakter"
-                                value={form.password}
-                                onChange={e => handleChange('password', e.target.value)}
-                                required
-                                autoComplete="new-password"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPass(p => !p)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-                            >
-                                {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="font-pixel text-[10px] text-cyan-300 mb-1 block">ŞİFRE TEKRARI</label>
-                        <div className="relative">
-                            <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                            <input
-                                className="input-field pl-9 text-sm"
-                                type={showPass ? 'text' : 'password'}
-                                placeholder="Şifreni tekrar yaz"
-                                value={form.confirm}
-                                onChange={e => handleChange('confirm', e.target.value)}
-                                required
-                                autoComplete="new-password"
-                            />
-                        </div>
-                    </div>
-
-                    {error && (
-                        <div className="flex items-center gap-2 bg-red-950 border border-red-500 text-red-300 rounded-lg p-2.5 text-xs font-arcade">
-                            <AlertCircle size={16} />
-                            <span>{error}</span>
-                        </div>
-                    )}
-
-                    {success && (
-                        <div className="flex items-center gap-2 bg-emerald-950 border border-emerald-500 text-emerald-300 rounded-lg p-2.5 text-xs font-arcade">
-                            <CheckCircle size={16} />
-                            <span>{success}</span>
-                        </div>
-                    )}
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="pixel-btn bg-emerald-500 hover:bg-emerald-400 text-slate-950 w-full mt-2 py-3.5 text-xs"
-                    >
-                        {loading ? 'KAYDEDİLİYOR...' : 'KAYIT OL VE BAŞLA'}
-                    </button>
-                </form>
-
-                <div className="mt-5 pt-3 border-t border-slate-800 text-center text-xs font-arcade text-slate-400">
-                    Zaten hesabın var mı?{' '}
-                    <Link href="/giris" className="text-yellow-400 hover:text-yellow-300 font-pixel text-[10px] underline ml-1">
-                        GİRİŞ YAP
-                    </Link>
+                {/* Trust badges */}
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-400">
+                    <span className="flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-green-500" />
+                        Güvenli
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-blue-500" />
+                        Çocuk Dostu
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-purple-500" />
+                        Reklamsız
+                    </span>
                 </div>
             </motion.div>
         </main>

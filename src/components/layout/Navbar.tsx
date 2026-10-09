@@ -1,52 +1,150 @@
-// components/layout/Navbar.tsx — Retro Arcade Navigation
+// components/layout/Navbar.tsx — Clean Navigation
 'use client';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { Home, Gamepad2, TrendingUp, User, ShieldCheck } from 'lucide-react';
-import Sidebar from './Sidebar';
+import { Home, Gamepad2, TrendingUp, User, ShieldCheck, Menu, X, Star } from 'lucide-react';
+import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 const navItems = [
-    { href: '/panel', icon: Home, label: 'ANA SAYFA' },
-    { href: '/panel/oyunlar', icon: Gamepad2, label: 'OYUNLAR' },
-    { href: '/panel/ilerleme', icon: TrendingUp, label: 'İLERLEME' },
-    { href: '/panel/profil', icon: User, label: 'PROFİL' },
-    { href: '/panel/veli-paneli', icon: ShieldCheck, label: 'VELİ' },
+    { href: '/panel', icon: Home, label: 'Ana Sayfa' },
+    { href: '/panel/oyunlar', icon: Gamepad2, label: 'Oyunlar' },
+    { href: '/panel/ilerleme', icon: TrendingUp, label: 'İlerleme' },
+    { href: '/panel/profil', icon: User, label: 'Profil' },
+    { href: '/panel/veli-paneli', icon: ShieldCheck, label: 'Veli Paneli' },
 ];
 
 export default function Navbar() {
     const pathname = usePathname();
+    const { user, signOut } = useAuth();
+    const [mobileOpen, setMobileOpen] = useState(false);
+
+    const handleSignOut = async () => {
+        await signOut();
+        setMobileOpen(false);
+    };
 
     return (
-        <>
-            {/* Desktop: Dedicated Retro Sidebar */}
-            <Sidebar />
+        <header className="relative z-20 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0">
+            <nav className="container-main mx-auto px-4" aria-label="Ana navigasyon">
+                <div className="flex items-center justify-between h-16">
+                    {/* Logo */}
+                    <Link href="/panel" className="flex items-center gap-2" aria-label="FrogFriends Ana Sayfa">
+                        <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center shadow-lg">
+                            <Star className="w-5 h-5 text-white" />
+                        </span>
+                        <span className="font-fun text-xl text-gray-800 hidden sm:block">FrogFriends</span>
+                    </Link>
 
-            {/* Mobile Bottom Navigation */}
-            <nav className="mobile-nav md:hidden fixed bottom-0 inset-x-0 bg-slate-950/95 border-t-3 border-slate-800 z-40 flex justify-around pt-2 px-2 select-none">
-                {navItems.map(({ href, icon: Icon, label }) => {
-                    const active = pathname === href || (href !== '/panel' && pathname.startsWith(href));
-                    return (
-                        <Link
-                            key={href}
-                            href={href}
-                            className="flex flex-col items-center gap-1 px-2 py-1"
-                        >
-                            <div className={`p-2 rounded-lg border-2 transition-all ${
-                                active
-                                    ? 'bg-emerald-600 border-emerald-400 text-white shadow-sm'
-                                    : 'border-transparent text-slate-400 hover:text-slate-200'
-                            }`}>
-                                <Icon size={18} />
+                    {/* Desktop Navigation */}
+                    <div className="hidden md:flex items-center gap-1">
+                        {navItems.map(({ href, icon: Icon, label }) => {
+                            const active = pathname === href || (href !== '/panel' && pathname.startsWith(href));
+                            return (
+                                <Link
+                                    key={href}
+                                    href={href}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl font-rounded text-sm transition-all ${
+                                        active
+                                            ? 'bg-green-50 text-green-700'
+                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                    }`}
+                                    aria-current={active ? 'page' : undefined}
+                                >
+                                    <Icon size={18} aria-hidden="true" />
+                                    <span>{label}</span>
+                                </Link>
+                            );
+                        })}
+                    </div>
+
+                    {/* User Menu / Actions */}
+                    <div className="hidden md:flex items-center gap-3">
+                        {user ? (
+                            <div className="flex items-center gap-3">
+                                {/* Stars display */}
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 rounded-xl">
+                                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                    <span className="font-fun text-green-700">0</span>
+                                </div>
+                                <button
+                                    onClick={handleSignOut}
+                                    className="btn btn-ghost btn-small text-red-600 hover:bg-red-50 border-red-200"
+                                >
+                                    Çıkış
+                                </button>
                             </div>
-                            <span className={`font-pixel text-[8px] tracking-tight ${
-                                active ? 'text-yellow-300 font-bold' : 'text-slate-400'
-                            }`}>
-                                {label}
-                            </span>
-                        </Link>
-                    );
-                })}
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <Link href="/giris" className="btn btn-ghost btn-small">Giriş Yap</Link>
+                                <Link href="/kayit" className="btn btn-primary btn-small">Kayıt Ol</Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Mobile Menu Button */}
+                    <button
+                        className="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
+                        onClick={() => setMobileOpen(!mobileOpen)}
+                        aria-expanded={mobileOpen}
+                        aria-controls="mobile-menu"
+                        aria-label={mobileOpen ? 'Menüyü kapat' : 'Menüyü aç'}
+                    >
+                        {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    </button>
+                </div>
+
+                {/* Mobile Menu */}
+                <motion.div
+                    id="mobile-menu"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="md:hidden overflow-hidden border-t border-gray-100 bg-white"
+                >
+                    <div className="py-4 space-y-2">
+                        {navItems.map(({ href, icon: Icon, label }) => {
+                            const active = pathname === href || (href !== '/panel' && pathname.startsWith(href));
+                            return (
+                                <Link
+                                    key={href}
+                                    href={href}
+                                    onClick={() => setMobileOpen(false)}
+                                    className={`flex items-center gap-3 px-4 py-3 rounded-xl font-rounded transition-all ${
+                                        active
+                                            ? 'bg-green-50 text-green-700'
+                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <Icon size={20} aria-hidden="true" />
+                                    <span>{label}</span>
+                                </Link>
+                            );
+                        })}
+                        <div className="pt-4 border-t border-gray-100 space-y-2">
+                            {user ? (
+                                <button
+                                    onClick={handleSignOut}
+                                    className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-rounded text-red-600 hover:bg-red-50 transition-colors"
+                                >
+                                    <User className="w-5 h-5" />
+                                    <span>Çıkış Yap</span>
+                                </button>
+                            ) : (
+                                <>
+                                    <Link href="/giris" onClick={() => setMobileOpen(false)} className="block">
+                                        <button className="w-full btn btn-ghost justify-center">Giriş Yap</button>
+                                    </Link>
+                                    <Link href="/kayit" onClick={() => setMobileOpen(false)} className="block">
+                                        <button className="w-full btn btn-primary">Kayıt Ol</button>
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </motion.div>
             </nav>
-        </>
+        </header>
     );
 }

@@ -34,7 +34,7 @@ export function scoreToStars(score: number): 1 | 2 | 3 {
     return 1;
 }
 
-/** Seviyeyi hesapla */
+/** Fallback seviye hesapla (offline/localStorage için) */
 export function starsToLevel(totalStars: number): number {
     return Math.floor(totalStars / 10) + 1;
 }

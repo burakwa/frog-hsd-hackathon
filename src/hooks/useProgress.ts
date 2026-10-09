@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { GameSession, Badge } from '@/types';
+import { useAuth } from './useAuth';
+import { starsToLevel } from '@/lib/utils/helpers';
 
 const INITIAL_BADGES: Badge[] = [
     { id: 'first_word', ad: 'İlk Kelime', aciklama: 'İlk konuşma egzersizini başarıyla tamamladın!', emoji: '🌱', kazanildi: true, tarih: 'Bugün' },
@@ -13,22 +15,22 @@ const INITIAL_BADGES: Badge[] = [
     { id: 'story_teller', ad: 'Masal Anlatıcısı', aciklama: 'Bir hikayeyi baştan sona tamamladın!', emoji: '📖', kazanildi: false },
 ];
 
-export function useProgress(userId?: string) {
+export function useProgress() {
+    const { user, profile } = useAuth();
     const [sessions, setSessions] = useState<GameSession[]>([]);
-    const [totalStars, setTotalStars] = useState(12);
+    const [totalStars, setTotalStars] = useState(0);
+    const [level, setLevel] = useState(1);
     const [badges, setBadges] = useState<Badge[]>(INITIAL_BADGES);
     const [loading, setLoading] = useState(false);
-
     const supabase = createClient();
 
-    const loadProgress = useCallback(async () => {
-        setLoading(true);
-
-        // 1. Load from localStorage if present
+    // Load from localStorage first (for instant UI)
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const localStars = localStorage.getItem('frog_total_stars');
             if (localStars) {
                 setTotalStars(Number(localStars));
+                setLevel(starsToLevel(Number(localStars)));
             }
             const localSessions = localStorage.getItem('frog_game_sessions');
             if (localSessions) {
@@ -39,28 +41,72 @@ export function useProgress(userId?: string) {
                 }
             }
         }
+    }, []);
 
-        // 2. If authenticated Supabase user, fetch from DB
-        if (userId) {
-            try {
-                const { data } = await supabase
-                    .from('game_sessions')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('created_at', { ascending: false });
-
-                if (data && data.length > 0) {
-                    setSessions(data as GameSession[]);
-                    const stars = (data as GameSession[]).reduce((sum, s) => sum + (s.yildiz ?? 0), 0);
-                    setTotalStars(stars);
-                }
-            } catch {
-                // Supabase table or network fallback
+    // Load from Supabase if user is authenticated
+    const loadFromSupabase = useCallback(async () => {
+        if (!user) {
+            // Guest user - use profile from localStorage or defaults
+            if (profile) {
+                setTotalStars(profile.toplam_yildiz || 0);
+                setLevel(profile.seviye || 1);
             }
+            return;
         }
+        
+        setLoading(true);
+        
+        try {
+            // 1. Get profile data (authoritative source for stars & level)
+            if (profile) {
+                setTotalStars(profile.toplam_yildiz || 0);
+                setLevel(profile.seviye || 1);
+            }
 
-        setLoading(false);
-    }, [userId, supabase]);
+            // 2. Get game sessions
+            const { data: sessionsData, error } = await supabase
+                .from('game_sessions')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            if (!error && sessionsData) {
+                setSessions(sessionsData as GameSession[]);
+                
+                // Sync to localStorage for offline support
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('frog_game_sessions', JSON.stringify(sessionsData));
+                }
+            }
+
+            // 3. Get badges from DB
+            const { data: badgesData } = await supabase
+                .from('badges')
+                .select('*')
+                .eq('user_id', user.id);
+
+            if (badgesData) {
+                const mergedBadges = INITIAL_BADGES.map(badge => {
+                    const dbBadge = badgesData.find(b => b.badge_id === badge.id);
+                    return dbBadge ? {
+                        ...badge,
+                        kazanildi: dbBadge.kazanildi,
+                        tarih: dbBadge.kazanildigi_tarih ? new Date(dbBadge.kazanildigi_tarih).toLocaleDateString('tr-TR') : badge.tarih,
+                    } : badge;
+                });
+                setBadges(mergedBadges);
+            }
+        } catch {
+            // Supabase not configured or network error - fallback to profile/localStorage
+        } finally {
+            setLoading(false);
+        }
+    }, [user, profile, supabase]);
+
+    useEffect(() => {
+        loadFromSupabase();
+    }, [loadFromSupabase]);
 
     const addStars = useCallback((count: number) => {
         setTotalStars(prev => {
@@ -70,6 +116,7 @@ export function useProgress(userId?: string) {
             }
             return next;
         });
+        setLevel(prev => starsToLevel(prev + count)); // fallback for local
     }, []);
 
     const recordSession = useCallback(async (
@@ -80,7 +127,7 @@ export function useProgress(userId?: string) {
     ) => {
         const newSession: GameSession = {
             id: String(Date.now()),
-            user_id: userId || 'local-player',
+            user_id: user?.id || 'local-player',
             oyun,
             skor,
             yildiz,
@@ -96,7 +143,11 @@ export function useProgress(userId?: string) {
             return updated;
         });
 
-        // Check badges
+        // Local optimistic update
+        setTotalStars(prev => prev + yildiz);
+        setLevel(starsToLevel(totalStars + yildiz));
+
+        // Check badges locally
         setBadges(prev =>
             prev.map(b => {
                 if (b.id === 'star_collector' && (totalStars + yildiz >= 15)) {
@@ -112,37 +163,67 @@ export function useProgress(userId?: string) {
             })
         );
 
-        if (userId) {
+        // Save to Supabase if authenticated
+        if (user) {
             try {
                 await supabase.from('game_sessions').insert({
-                    user_id: userId,
+                    user_id: user.id,
                     oyun,
                     skor,
                     yildiz,
                     sure_saniye,
                 });
+
+                // Call DB function to update stars & level atomically
+                await supabase.rpc('update_user_progress', {
+                    user_uuid: user.id,
+                    new_stars: yildiz,
+                });
+
+                // Refresh profile to get new values
+                await supabase.auth.refreshSession();
+
+                // Check and award badges in database
+                const badgeChecks = [
+                    { badge_id: 'first_word', condition: true },
+                    { badge_id: 'star_collector', condition: totalStars + yildiz >= 15 },
+                    { badge_id: 'perfect_pitch', condition: skor >= 95 },
+                    { badge_id: 'story_teller', condition: oyun === 'sesli-masal' },
+                ];
+
+                for (const check of badgeChecks) {
+                    if (check.condition) {
+                        await supabase
+                            .from('badges')
+                            .upsert({
+                                user_id: user.id,
+                                badge_id: check.badge_id,
+                                kazanildi: true,
+                                kazanildigi_tarih: new Date().toISOString(),
+                            }, {
+                                onConflict: 'user_id,badge_id',
+                            });
+                    }
+                }
             } catch {
-                // Ignore DB insertion error for local development
+                // Ignore DB errors for local development
             }
         }
-    }, [userId, supabase, totalStars]);
+    }, [user, supabase, totalStars]);
 
     const saveSession = useCallback(async (session: Omit<GameSession, 'id' | 'created_at' | 'user_id'>) => {
         await recordSession(session.oyun, session.skor, session.yildiz, session.sure_saniye);
     }, [recordSession]);
 
-    useEffect(() => {
-        loadProgress();
-    }, [loadProgress]);
-
     return {
         sessions,
         totalStars,
+        level,
         badges,
         loading,
         addStars,
         recordSession,
         saveSession,
-        loadProgress,
+        refresh: loadFromSupabase,
     };
 }

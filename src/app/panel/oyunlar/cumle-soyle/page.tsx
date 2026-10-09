@@ -1,9 +1,9 @@
-// app/panel/oyunlar/cumle-soyle/page.tsx — 3. Oyun: Cümle Tamamlama (Retro RPG Tarzı)
+// app/panel/oyunlar/cumle-soyle/page.tsx — Cümle Söyle Oyunu
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Volume2, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Volume2, HelpCircle, CheckCircle2, Mic } from 'lucide-react';
 import PraiseOverlay from '@/components/game/PraiseOverlay';
 import Character from '@/components/game/Character';
 import MicrophoneButton from '@/components/speech/MicrophoneButton';
@@ -119,38 +119,50 @@ export default function CumleSoylePage() {
     };
 
     return (
-        <main className="w-full min-h-screen bg-slate-950 pt-2 md:pt-4 px-4 md:px-6 pb-4 flex flex-col max-w-4xl mx-auto select-none">
+        <div className="max-w-4xl mx-auto space-y-6 animate-slide-up">
             {/* Top Bar */}
-            <div className="flex items-center justify-between mb-4 border-b-2 border-slate-800 pb-3">
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between"
+            >
                 <Link
                     href="/panel/oyunlar"
-                    className="pixel-btn bg-slate-800 hover:bg-slate-700 text-cyan-400 py-2 px-3 text-xs flex items-center gap-1.5"
+                    className="btn btn-ghost btn-small"
                 >
-                    <ArrowLeft size={14} />
-                    <span>GERİ</span>
+                    <ArrowLeft className="w-4 h-4" />
+                    Geri
                 </Link>
-                <div className="font-pixel text-yellow-400 text-xs bg-slate-900 border-2 border-yellow-400/50 px-3 py-1.5 rounded-lg shadow-sm">
+                <div className="badge badge-blue">
                     QUEST {exerciseIndex + 1} / {sentences.length}
                 </div>
-            </div>
+            </motion.div>
 
-            {/* Retro RPG Dialogue Box Card */}
-            <div className="relative pixel-box bg-slate-900/90 border-cyan-400 p-6 rounded-2xl mb-4 overflow-hidden">
-                <div className="retro-lake-scene absolute inset-0 pointer-events-none z-0 opacity-35" aria-hidden="true" />
+            {/* Sentence Card */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="card card-elevated p-6 md:p-8 relative overflow-hidden"
+            >
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-100/50 rounded-full blur-3xl" />
 
                 <div className="relative z-10 flex flex-col items-center text-center">
-                    <div className="mb-2">
-                        <Character mood={mood} size={72} showLilypad={true} />
+                    {/* Frog */}
+                    <div className="mb-4">
+                        <Character mood={mood} size={80} showLilypad={true} />
                     </div>
 
-                    <span className="text-4xl mb-2">{current.emoji}</span>
+                    <span className="text-5xl mb-4">{current.emoji}</span>
 
-                    {/* Sentence with Blank Highlight */}
-                    <h1 className="font-pixel text-lg md:text-xl text-white mb-4 leading-relaxed max-w-2xl">
+                    {/* Sentence with Blank */}
+                    <h1 className="font-fun text-xl md:text-2xl text-gray-800 mb-6 leading-relaxed max-w-2xl text-center">
                         {completed ? (
                             <span>
                                 {current.cumle.split('___')[0]}
-                                <span className="text-emerald-400 underline decoration-wavy px-2 bg-emerald-950/80 rounded border border-emerald-400">
+                                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-xl font-bold underline decoration-wavy underline-offset-4">
                                     {current.bosluk.toUpperCase()}
                                 </span>
                                 {current.cumle.split('___')[1]}
@@ -158,7 +170,7 @@ export default function CumleSoylePage() {
                         ) : (
                             <span>
                                 {current.cumle.split('___')[0]}
-                                <span className="inline-block border-b-4 border-dashed border-yellow-400 text-yellow-300 px-3 bg-yellow-950/60 rounded">
+                                <span className="inline-block border-b-4 border-dashed border-yellow-400 text-yellow-600 px-4 bg-yellow-50 rounded-xl font-bold">
                                     [ ??? ]
                                 </span>
                                 {current.cumle.split('___')[1]}
@@ -167,20 +179,21 @@ export default function CumleSoylePage() {
                     </h1>
 
                     {/* Audio & Hint Buttons */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 mb-4">
                         <button
                             onClick={() => speak(current.cumle.replace('___', '...'))}
-                            className="pixel-btn bg-slate-800 hover:bg-slate-700 text-cyan-300 py-2 px-3 text-xs flex items-center gap-2"
+                            className="btn btn-secondary"
                         >
-                            <Volume2 size={14} /> DİNLE
+                            <Volume2 className="w-4 h-4" />
+                            Dinle
                         </button>
 
                         <button
                             onClick={() => setShowHint(h => !h)}
-                            className="pixel-btn bg-amber-600 hover:bg-amber-500 text-slate-950 py-2 px-3 text-xs flex items-center gap-1.5"
+                            className="btn btn-accent"
                         >
-                            <HelpCircle size={14} />
-                            <span>İPUCU {showHint ? 'KAPAT' : 'GÖSTER'}</span>
+                            <HelpCircle className="w-4 h-4" />
+                            <span>İpucu {showHint ? 'Kapat' : 'Göster'}</span>
                         </button>
                     </div>
 
@@ -190,57 +203,81 @@ export default function CumleSoylePage() {
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
-                                className="mt-3 p-2.5 bg-amber-950 border border-amber-500 text-amber-200 text-xs font-arcade rounded-xl max-w-md mx-auto"
+                                className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-sm font-rounded"
                             >
-                                💡 İPUCU: {current.ipucu}
+                                💡 İpucu: {current.ipucu}
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
-            </div>
+            </motion.div>
 
-            {/* Retro Microphone & Choice Pills Section */}
-            <div className="pixel-box p-4 rounded-xl flex flex-col items-center gap-3">
-                <p className="font-pixel text-[10px] text-slate-400 text-center">
-                    KELİMEYİ MİKROFONA SÖYLE VEYA AŞAĞIDAN SEÇ!
+            {/* Microphone & Options */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="card card-elevated p-6"
+            >
+                <p className="font-rounded text-sm text-gray-500 text-center mb-4">
+                    Kelimeyi mikrofonla söyle veya aşağıdan seç!
                 </p>
 
-                <SpeechVisualizer isActive={isListening} level={level} bars={9} />
+                <div className="mb-6">
+                    <SpeechVisualizer isActive={isListening} level={level} bars={9} />
+                </div>
 
-                <MicrophoneButton
-                    isListening={isListening}
-                    onToggle={handleToggleMic}
-                    size={76}
-                />
+                <div className="flex justify-center mb-6">
+                    <MicrophoneButton
+                        isListening={isListening}
+                        onToggle={handleToggleMic}
+                        size={76}
+                    />
+                </div>
 
                 {transcript && (
-                    <div className="bg-slate-900 border border-cyan-400 font-pixel text-xs text-yellow-300 px-4 py-2 rounded-lg">
-                        DUYULAN: &quot;{transcript}&quot;
-                    </div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-center"
+                    >
+                        <span className="font-fun text-sm text-blue-700">Duyulan: </span>
+                        <span className="font-mono text-blue-800">"{transcript}"</span>
+                    </motion.div>
                 )}
 
                 {analysis && (
-                    <div className="w-full max-w-md">
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="w-full max-w-md mx-auto mb-6"
+                    >
                         <PronunciationFeedback
                             errors={analysis.errors}
                             score={analysis.score}
                         />
-                    </div>
+                    </motion.div>
                 )}
 
-                {/* Choice Pills as Retro Arcade Buttons */}
-                <div className="mt-2 flex flex-wrap gap-2.5 justify-center">
+                {/* Word Options */}
+                <div className="flex flex-wrap gap-3 justify-center">
                     {options.map((opt, i) => (
-                        <button
+                        <motion.button
                             key={i}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.3 + i * 0.1 }}
                             onClick={() => handleSelectOption(opt)}
-                            className="pixel-btn bg-slate-900 hover:bg-indigo-600 text-yellow-300 hover:text-white border-yellow-400 py-2.5 px-4 text-xs tracking-wider"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="btn btn-secondary px-6 py-3 group"
                         >
-                            ▶ {opt.toUpperCase()}
-                        </button>
+                            <Mic className="w-4 h-4 transition-transform group-hover:scale-110" />
+                            {opt.toUpperCase()}
+                        </motion.button>
                     ))}
                 </div>
-            </div>
+            </motion.div>
 
             <PraiseOverlay
                 isOpen={showPraise}
@@ -254,6 +291,6 @@ export default function CumleSoylePage() {
                     setAnalysis(null);
                 }}
             />
-        </main>
+        </div>
     );
 }

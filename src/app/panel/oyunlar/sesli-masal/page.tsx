@@ -1,9 +1,9 @@
-// app/panel/oyunlar/sesli-masal/page.tsx — 4. Oyun: Sesli Masal (Retro Hikaye Modu)
+// app/panel/oyunlar/sesli-masal/page.tsx — Sesli Masal Oyunu
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Volume2, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Volume2, ChevronLeft, ChevronRight, CheckCircle2, BookOpen, Play } from 'lucide-react';
 import PraiseOverlay from '@/components/game/PraiseOverlay';
 import Character from '@/components/game/Character';
 import MicrophoneButton from '@/components/speech/MicrophoneButton';
@@ -107,70 +107,75 @@ export default function SesliMasalPage() {
     };
 
     return (
-        <main className="w-full min-h-screen bg-slate-950 pt-2 md:pt-4 px-4 md:px-6 pb-4 flex flex-col max-w-4xl mx-auto select-none">
+        <div className="max-w-4xl mx-auto space-y-6 animate-slide-up">
             {/* Top Navigation */}
-            <div className="flex items-center justify-between mb-4 border-b-2 border-slate-800 pb-3">
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between"
+            >
                 <Link
                     href="/panel/oyunlar"
-                    className="pixel-btn bg-slate-800 hover:bg-slate-700 text-cyan-400 py-2 px-3 text-xs flex items-center gap-1.5"
+                    className="btn btn-ghost btn-small"
                 >
-                    <ArrowLeft size={14} />
-                    <span>GERİ</span>
+                    <ArrowLeft className="w-4 h-4" />
+                    Geri
                 </Link>
 
-                {/* Story Selector Pills */}
-                <div className="flex gap-1.5 overflow-x-auto py-1">
+                {/* Story Selector */}
+                <div className="flex gap-2 overflow-x-auto py-2">
                     {stories.map((s, idx) => (
                         <button
                             key={s.id}
                             onClick={() => setStoryIndex(idx)}
-                            className={`font-pixel text-[9px] px-2.5 py-1.5 rounded-lg border-2 transition-all whitespace-nowrap ${
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-rounded text-sm whitespace-nowrap transition-all ${
                                 storyIndex === idx
-                                    ? 'bg-yellow-400 text-slate-950 border-yellow-300 font-bold shadow-sm'
-                                    : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-white'
+                                    ? 'bg-purple-600 text-white shadow-lg'
+                                    : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-gray-100'
                             }`}
                         >
-                            {s.emoji} {s.baslik.toUpperCase()}
+                            <span className="text-lg">{s.emoji}</span>
+                            <span>{s.baslik}</span>
                         </button>
                     ))}
                 </div>
-            </div>
+            </motion.div>
 
-            {/* Retro 16-Bit RPG Story Book Card */}
+            {/* Story Book Card */}
             <motion.div
                 key={currentStory.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative pixel-box bg-slate-900 border-yellow-400 p-5 md:p-6 rounded-2xl mb-4 overflow-hidden"
+                className="card card-elevated p-6 md:p-8 relative overflow-hidden"
             >
-                <div className="retro-lake-scene absolute inset-0 pointer-events-none z-0 opacity-30" aria-hidden="true" />
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-purple-100/50 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-pink-100/50 rounded-full blur-3xl" />
 
                 <div className="relative z-10">
                     {/* Header */}
-                    <div className="flex items-center justify-between border-b-2 border-slate-800 pb-3 mb-4">
-                        <div className="flex items-center gap-3">
-                            <span className="text-3xl">{currentStory.emoji}</span>
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center">
+                                <span className="text-2xl">{currentStory.emoji}</span>
+                            </div>
                             <div>
-                                <h1 className="font-pixel text-base md:text-lg text-yellow-300">
-                                    {currentStory.baslik.toUpperCase()}
-                                </h1>
-                                <p className="font-arcade text-[11px] text-slate-400">
-                                    CÜMLE {sentenceIndex + 1} / {sentences.length}
-                                </p>
+                                <h1 className="font-fun text-xl md:text-2xl text-gray-800">{currentStory.baslik}</h1>
+                                <p className="text-gray-500 text-sm">Cümle {sentenceIndex + 1} / {sentences.length}</p>
                             </div>
                         </div>
 
                         <button
                             onClick={handleReadAll}
-                            className="pixel-btn bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-3 text-[10px] flex items-center gap-1.5"
+                            className="btn btn-secondary"
                         >
-                            <Volume2 size={14} />
-                            <span>TÜMÜNÜ DİNLE</span>
+                            <Volume2 className="w-4 h-4" />
+                            Tümünü Dinle
                         </button>
                     </div>
 
-                    {/* Story Sentences Display with Karaoke Highlight */}
-                    <div className="space-y-2.5 mb-5 max-h-[300px] overflow-y-auto pr-1">
+                    {/* Sentences List */}
+                    <div className="space-y-3 mb-6 max-h-[350px] overflow-y-auto pr-2">
                         {sentences.map((sent, idx) => {
                             const isActive = idx === sentenceIndex;
                             const isDone = readSentences.includes(idx);
@@ -178,31 +183,38 @@ export default function SesliMasalPage() {
                                 <motion.div
                                     key={idx}
                                     onClick={() => setSentenceIndex(idx)}
-                                    className={`p-3.5 rounded-xl cursor-pointer transition-all border-2 ${
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    className={`p-4 rounded-xl cursor-pointer transition-all border-2 ${
                                         isActive
-                                            ? 'bg-slate-800 border-yellow-400 shadow-[3px_3px_0px_#000]'
+                                            ? 'bg-purple-50 border-purple-300 shadow-lg'
                                             : isDone
-                                            ? 'bg-emerald-950/40 border-emerald-600 text-emerald-200'
-                                            : 'bg-slate-950/60 border-slate-800 hover:border-slate-600 text-slate-300'
+                                            ? 'bg-green-50 border-green-200 text-green-700'
+                                            : 'bg-white border-gray-100 hover:border-gray-200 hover:bg-gray-50 text-gray-700'
                                     }`}
                                 >
-                                    <div className="flex items-start gap-2.5">
-                                        <span className="font-pixel text-[10px] text-yellow-400 mt-0.5">
-                                            {idx + 1}.
-                                        </span>
-                                        <p
-                                            className={`flex-1 text-sm md:text-base leading-relaxed ${
-                                                isActive
-                                                    ? 'font-bold text-yellow-200'
-                                                    : isDone
-                                                    ? 'text-emerald-200'
-                                                    : 'text-slate-300'
-                                            }`}
-                                        >
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-fun text-xs mt-0.5 ${
+                                            isActive ? 'bg-purple-500 text-white' :
+                                            isDone ? 'bg-green-500 text-white' :
+                                            'bg-gray-100 text-gray-400'
+                                        }">
+                                            {isDone ? (
+                                                <CheckCircle2 className="w-4 h-4" />
+                                            ) : (
+                                                idx + 1
+                                            )}
+                                        </div>
+                                        <p className={`flex-1 text-sm md:text-base leading-relaxed ${
+                                            isActive ? 'font-semibold text-gray-900' :
+                                            isDone ? 'text-green-700' :
+                                            'text-gray-600'
+                                        }`}>
                                             {sent}
                                         </p>
                                         {isDone && (
-                                            <CheckCircle2 size={18} className="text-emerald-400 shrink-0 mt-0.5" />
+                                            <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
                                         )}
                                     </div>
                                 </motion.div>
@@ -210,57 +222,68 @@ export default function SesliMasalPage() {
                         })}
                     </div>
 
-                    {/* Sentence Audio & Progress Controls */}
-                    <div className="flex items-center justify-between pt-3 border-t-2 border-slate-800">
+                    {/* Navigation Controls */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                         <button
                             onClick={handlePrevSentence}
                             disabled={sentenceIndex === 0}
-                            className="pixel-btn bg-slate-800 text-slate-300 py-2 px-3 text-[10px] disabled:opacity-30"
+                            className="btn btn-ghost disabled:opacity-30"
                         >
-                            <ChevronLeft size={14} />
-                            <span>ÖNCEKİ</span>
+                            <ChevronLeft className="w-4 h-4" />
+                            Önceki
                         </button>
 
                         <button
                             onClick={handleReadActive}
-                            className="pixel-btn bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-2 px-4 text-[10px] flex items-center gap-1.5"
+                            className="btn btn-primary"
                         >
-                            <Volume2 size={14} />
-                            <span>{isSpeaking ? 'DURDUR' : 'BU CÜMLEYİ DİNLE'}</span>
+                            <Volume2 className="w-4 h-4" />
+                            {isSpeaking ? 'Durdur' : 'Bu Cümleyi Dinle'}
                         </button>
 
                         <button
                             onClick={handleNextSentence}
-                            className="pixel-btn bg-slate-800 text-slate-300 py-2 px-3 text-[10px]"
+                            className="btn btn-secondary"
                         >
-                            <span>SONRAKİ</span>
-                            <ChevronRight size={14} />
+                            Sonraki
+                            <ChevronRight className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
             </motion.div>
 
-            {/* Read Along Voice Practice HUD */}
-            <div className="pixel-box p-4 rounded-xl flex flex-col items-center gap-3">
-                <Character mood={isListening ? 'speaking' : 'happy'} size={56} showLilypad={true} />
-                <p className="font-pixel text-[10px] text-slate-400 text-center">
-                    CÜMLEYİ YÜKSEK SESLE SEN OKU!
-                </p>
+            {/* Read Along Practice */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="card card-colored-purple p-6"
+            >
+                <div className="flex flex-col items-center gap-4 text-center">
+                    <Character mood={isListening ? 'speaking' : 'happy'} size={70} showLilypad={true} />
+                    <p className="font-fun text-lg text-purple-800">Cümleyi Yüksek Sesle Sen Oku! 📖</p>
 
-                <SpeechVisualizer isActive={isListening} level={level} bars={9} />
-
-                <MicrophoneButton
-                    isListening={isListening}
-                    onToggle={handleToggleMic}
-                    size={64}
-                />
-
-                {transcript && (
-                    <div className="bg-slate-900 border border-yellow-400 text-yellow-300 font-pixel text-[11px] px-3.5 py-2 rounded-lg">
-                        &quot;{transcript}&quot;
+                    <div className="w-full max-w-md">
+                        <SpeechVisualizer isActive={isListening} level={level} bars={9} />
                     </div>
-                )}
-            </div>
+
+                    <MicrophoneButton
+                        isListening={isListening}
+                        onToggle={handleToggleMic}
+                        size={64}
+                    />
+
+                    {transcript && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="p-3 bg-white/50 border border-purple-200 rounded-xl text-center"
+                        >
+                            <span className="font-mono text-purple-800">"{transcript}"</span>
+                        </motion.div>
+                    )}
+                </div>
+            </motion.div>
 
             <PraiseOverlay
                 isOpen={showPraise}
@@ -277,6 +300,6 @@ export default function SesliMasalPage() {
                     setReadSentences([]);
                 }}
             />
-        </main>
+        </div>
     );
 }

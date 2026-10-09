@@ -25,8 +25,15 @@ export function useSpeechRecognition() {
     const start = useCallback(() => {
         const win = typeof window !== 'undefined' ? (window as any) : null;
         const SR = win?.SpeechRecognition || win?.webkitSpeechRecognition;
+        
         if (!SR) {
-            setError('Tarayıcın desteklemiyor, Chrome veya Edge kullan!');
+            setError('Bu tarayıcı ses tanımayı desteklemiyor. Lütfen Chrome, Edge veya Safari kullanın.');
+            return;
+        }
+
+        // HTTPS kontrolü (localhost hariç)
+        if (typeof window !== 'undefined' && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            setError('Ses tanıma için HTTPS gerekli. Yerel test için localhost kullanın.');
             return;
         }
 
@@ -44,9 +51,9 @@ export function useSpeechRecognition() {
             }
 
             const rec = new SR();
-            rec.lang = 'tr-TR';        // ⚠️ mutlaka tr-TR
-            rec.interimResults = true; // canlı takip
-            rec.continuous = false;    // tek kelime için yeterli
+            rec.lang = 'tr-TR';
+            rec.interimResults = true;
+            rec.continuous = false;
             rec.maxAlternatives = 1;
 
             rec.onresult = (e: any) => {
@@ -70,13 +77,21 @@ export function useSpeechRecognition() {
             };
 
             rec.onerror = (e: any) => {
+                let errorMessage = 'Bir sorun oluştu';
                 if (e.error === 'not-allowed') {
-                    setError('Mikrofon izni gerekli! 🔒');
+                    errorMessage = 'Mikrofon izni gerekli! Tarayıcı adres çubuğundaki kilit ikonuna tıklayıp "İzin ver" seçin. 🔒';
                 } else if (e.error === 'no-speech') {
-                    setError('Ses duyamadım, tekrar dener misin? 🎤');
+                    errorMessage = 'Ses duyamadım, tekrar dener misin? 🎤';
+                } else if (e.error === 'network') {
+                    errorMessage = 'Ağ hatası: İnternet bağlantınızı kontrol edin. Production için HTTPS gereklidir.';
+                } else if (e.error === 'service-not-allowed') {
+                    errorMessage = 'Ses tanıma servisi kullanılamıyor. Chrome/Edge/Safari güncel sürüm kullanın.';
+                } else if (e.error === 'aborted') {
+                    errorMessage = 'Dinleme iptal edildi.';
                 } else {
-                    setError('Bir sorun oluştu: ' + e.error);
+                    errorMessage = `Ses tanıma hatası: ${e.error}`;
                 }
+                setError(errorMessage);
                 setIsListening(false);
             };
 
