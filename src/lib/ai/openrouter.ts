@@ -15,6 +15,14 @@ export interface AIAnalysisRequest {
     childAge?: number;
 }
 
+export interface DetailedPhonemeError {
+    position: number;
+    expectedPhoneme: string;
+    spokenPhoneme: string;
+    description: string;
+    articulationTip: string;
+}
+
 export interface AIAnalysisResponse {
     feedback: string;
     encouragement: string;
@@ -22,6 +30,7 @@ export interface AIAnalysisResponse {
     phonemeFocus: string[];
     severity: 'low' | 'medium' | 'high';
     nextSteps: string[];
+    detailedErrors?: DetailedPhonemeError[];
 }
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
@@ -90,7 +99,7 @@ function buildSpeechTherapyPrompt(request: AIAnalysisRequest): string {
     
     const isCorrect = score >= 85;
     const errorDetails = errors.length > 0 
-        ? errors.map(e => `"${e.expected}" yerine "${e.spoken}" (${e.tip})`).join(', ')
+        ? errors.map(e => `"${e.expected}" yerine "${e.spoken}" (pozisyon: ${e.position}, ${e.tip})`).join(', ')
         : 'Belirgin hata yok';
 
     return `Çocuk (${childAge} yaş) "${targetWord}" kelimesini söylemeye çalıştı.
@@ -108,7 +117,16 @@ JSON formatında yanıt ver:
   "specificTips": ["Evde yapılabilecek 2-3 pratik önerisi"],
   "phonemeFocus": ["Odaklanılması gereken sesler (IPA formatında: /r/, /ʃ/ vb.)"],
   "severity": "low|medium|high",
-  "nextSteps": ["Bir sonraki adım önerileri"]
+  "nextSteps": ["Bir sonraki adım önerileri"],
+  "detailedErrors": [
+    {
+      "position": 0,
+      "expectedPhoneme": "/r/",
+      "spokenPhoneme": "/l/",
+      "description": "\"r\" sesi yerine \"l\" sesi duyuldu",
+      "articulationTip": "Dilinin ucunu biraz daha arkaya çekip titreştir"
+    }
+  ]
 }`;
 }
 
@@ -126,13 +144,22 @@ function getFallbackAnalysis(request: AIAnalysisRequest): AIAnalysisResponse {
             ],
             phonemeFocus: [],
             severity: 'low',
-            nextSteps: ['Sonraki kelimeye geç', 'Aynı kategoride yeni kelimeler dene']
+            nextSteps: ['Sonraki kelimeye geç', 'Aynı kategoride yeni kelimeler dene'],
+            detailedErrors: []
         };
     }
 
     // Basit hata analizi
     const firstError = errors[0];
     const phonemeFocus = firstError ? [firstError.expected] : [];
+
+    const detailedErrors = errors.slice(0, 3).map(e => ({
+        position: e.position,
+        expectedPhoneme: `/${e.expected}/`,
+        spokenPhoneme: e.spoken === '-' ? '⌀' : `/${e.spoken}/`,
+        description: `"${e.expected}" sesi yerine "${e.spoken === '-' ? 'hiçbir ses' : e.spoken}" duyuldu`,
+        articulationTip: e.tip
+    }));
 
     return {
         feedback: `"${targetWord}" kelimesinde küçük bir hata var. Doğrusu: "${targetWord}", sen "${spokenWord}" dedin.`,
@@ -147,7 +174,8 @@ function getFallbackAnalysis(request: AIAnalysisRequest): AIAnalysisResponse {
         nextSteps: [
             'Bu kelimeyi 3 kez daha dene',
             'Ses tanıma çalışıp tekrar kaydet'
-        ]
+        ],
+        detailedErrors
     };
 }
 

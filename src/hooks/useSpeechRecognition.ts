@@ -9,8 +9,13 @@ export function useSpeechRecognition() {
     const [error, setError] = useState<string | null>(null);
     const [isSupported, setIsSupported] = useState(true);
     const recRef = useRef<any>(null);
+    const isInitialMount = useRef(true);
 
     useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
         const supported =
             typeof window !== 'undefined' &&
             !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);

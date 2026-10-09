@@ -87,7 +87,7 @@ export default function PanelPage() {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center shadow-sm">
-                            <img src="/assets/logo.png" alt="FrogFriends" className="w-6 h-6" />
+                            <span className="text-2xl" aria-hidden="true">🐸</span>
                         </div>
                         <span className="font-fun text-xl text-gray-800">FrogFriends</span>
                     </div>

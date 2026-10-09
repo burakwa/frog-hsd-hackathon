@@ -279,7 +279,7 @@ export default function SesliMasalPage() {
                             animate={{ opacity: 1, y: 0 }}
                             className="p-3 bg-white/50 border border-green-200 rounded-xl text-center"
                         >
-                            <span className="font-mono text-green-800">"{transcript}"</span>
+                            <span className="font-mono text-green-800">{transcript}</span>
                         </motion.div>
                     )}
                 </div>

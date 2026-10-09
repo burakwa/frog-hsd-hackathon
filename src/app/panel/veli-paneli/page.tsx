@@ -2,11 +2,11 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Printer, Star, FileText, Brain, AlertTriangle, Lightbulb, Download, TrendingUp, Target, Award, Sparkles, X, Loader2, CheckCircle2, Clock, Heart, BookOpen, Dumbbell } from 'lucide-react';
+import { ShieldCheck, Printer, Star, FileText, Brain, AlertTriangle, Lightbulb, TrendingUp, Target, Sparkles, X, Loader2, CheckCircle2, Clock, BookOpen } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProgress } from '@/hooks/useProgress';
 import Character from '@/components/game/Character';
-import { useAIAnalysis, useAIProgressReport } from '@/hooks/useAIAnalysis';
+import { useAIProgressReport } from '@/hooks/useAIAnalysis';
 
 export default function VeliPaneliPage() {
     const { user, profile } = useAuth();
@@ -100,7 +100,7 @@ export default function VeliPaneliPage() {
             >
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center shadow-lg">
-                        <img src="/assets/logo.png" alt="FrogFriends" className="w-8 h-8 object-contain" />
+                        <span className="text-3xl" aria-hidden="true">🐸</span>
                     </div>
                     <div>
                         <h1 className="font-fun text-2xl md:text-3xl text-gray-800">Veli & Terapist Raporu</h1>

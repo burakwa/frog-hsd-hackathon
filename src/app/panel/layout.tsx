@@ -4,7 +4,18 @@ import type { ReactNode } from 'react';
 
 export default function PanelLayout({ children }: { children: ReactNode }) {
     return (
-        <div className="page-wrapper bg-pattern-dots min-h-screen">
+        <div className="page-wrapper min-h-screen relative">
+            {/* Panel background image */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+                <img 
+                    src="/assets/bg_panel.png" 
+                    alt="" 
+                    className="w-full h-full object-cover opacity-40"
+                    aria-hidden="true"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-green-50/30 to-blue-50/20" />
+            </div>
+            
             {/* Background decorative elements */}
             <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
                 <div className="absolute top-0 right-0 w-72 h-72 bg-green-100/30 rounded-full blur-3xl" />

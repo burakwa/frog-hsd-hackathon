@@ -71,9 +71,6 @@ export function useAuth() {
         await supabase.auth.signOut();
         setUser(null);
         setProfile(null);
-        if (typeof window !== 'undefined') {
-            window.location.href = '/';
-        }
     }, [supabase]);
 
     const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {

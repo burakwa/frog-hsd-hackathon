@@ -1,8 +1,9 @@
 // components/layout/Navbar.tsx — Clean Navigation
 'use client';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { Home, Gamepad2, TrendingUp, User, ShieldCheck, Menu, X, Star } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,9 +19,47 @@ const navItems = [
 
 export default function Navbar() {
     const pathname = usePathname();
+    const router = useRouter();
     const { user, signOut } = useAuth();
     const { totalStars } = useProgress();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const isInitialMount = useRef(true);
+
+    // Close menu on route change
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+        setMobileOpen(false);
+    }, [pathname]);
+
+    // Close menu on Escape key
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && mobileOpen) {
+                setMobileOpen(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [mobileOpen]);
+
+    // Close menu on click outside
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (mobileOpen && menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setMobileOpen(false);
+            }
+        };
+        if (mobileOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [mobileOpen]);
+
+    const closeMenu = () => setMobileOpen(false);
 
     return (
         <header className="relative z-20 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0">
@@ -91,54 +130,63 @@ export default function Navbar() {
                 </div>
 
                 {/* Mobile Menu */}
-                <motion.div
-                    id="mobile-menu"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="md:hidden overflow-hidden border-t border-gray-100 bg-white"
-                >
-                    <div className="py-4 space-y-2">
-                        {navItems.map(({ href, icon: Icon, label }) => {
-                            const active = pathname === href || (href !== '/panel' && pathname.startsWith(href));
-                            return (
-                                <Link
-                                    key={href}
-                                    href={href}
-                                    onClick={() => setMobileOpen(false)}
-                                    className={`flex items-center gap-3 px-4 py-3 rounded-xl font-rounded transition-all ${
-                                        active
-                                            ? 'bg-green-50 text-green-700'
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    <Icon size={20} aria-hidden="true" />
-                                    <span>{label}</span>
-                                </Link>
-                            );
-                        })}
-                        <div className="pt-4 border-t border-gray-100 space-y-2">
-                            {user ? (
-                                <button
-                                    onClick={signOut}
-                                    className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-rounded text-red-600 hover:bg-red-50 transition-colors"
-                                >
-                                    <User className="w-5 h-5" />
-                                    <span>Çıkış Yap</span>
-                                </button>
-                            ) : (
-                                <>
-                                    <Link href="/giris" onClick={() => setMobileOpen(false)} className="block">
-                                        <button className="w-full btn btn-ghost justify-center">Giriş Yap</button>
-                                    </Link>
-                                    <Link href="/kayit" onClick={() => setMobileOpen(false)} className="block">
-                                        <button className="w-full btn btn-primary">Kayıt Ol</button>
-                                    </Link>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </motion.div>
+                <AnimatePresence>
+                    {mobileOpen && (
+                        <motion.div
+                            ref={menuRef}
+                            id="mobile-menu"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="md:hidden overflow-hidden border-t border-gray-100 bg-white"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-label="Mobil menü"
+                        >
+                            <div className="py-4 space-y-2">
+                                {navItems.map(({ href, icon: Icon, label }) => {
+                                    const active = pathname === href || (href !== '/panel' && pathname.startsWith(href));
+                                    return (
+                                        <Link
+                                            key={href}
+                                            href={href}
+                                            onClick={closeMenu}
+                                            className={`flex items-center gap-3 px-4 py-3 rounded-xl font-rounded transition-all ${
+                                                active
+                                                    ? 'bg-green-50 text-green-700'
+                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            <Icon size={20} aria-hidden="true" />
+                                            <span>{label}</span>
+                                        </Link>
+                                    );
+                                })}
+                                <div className="pt-4 border-t border-gray-100 space-y-2">
+                                    {user ? (
+                                        <button
+                                            onClick={() => { signOut(); router.push('/'); closeMenu(); }}
+                                            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-rounded text-red-600 hover:bg-red-50 transition-colors"
+                                        >
+                                            <User className="w-5 h-5" />
+                                            <span>Çıkış Yap</span>
+                                        </button>
+                                    ) : (
+                                        <>
+                                            <Link href="/giris" onClick={closeMenu} className="block">
+                                                <button className="w-full btn btn-ghost justify-center">Giriş Yap</button>
+                                            </Link>
+                                            <Link href="/kayit" onClick={closeMenu} className="block">
+                                                <button className="w-full btn btn-primary">Kayıt Ol</button>
+                                            </Link>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </nav>
         </header>
     );

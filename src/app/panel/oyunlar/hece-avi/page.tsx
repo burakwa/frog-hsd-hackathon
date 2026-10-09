@@ -184,11 +184,11 @@ export default function HeceAviPage() {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center animate-bounce-subtle">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" className="w-7 h-7"><path d="M12 2v20M2 12h20"/></svg>
+                            <span className="text-3xl" aria-hidden="true">🪰</span>
                         </div>
                         <div>
                             <p className="font-rounded text-sm text-green-700 uppercase tracking-wider">Hedef Hece</p>
-                            <h2 className="font-fun text-3xl text-green-800">"{currentEx.hece.toUpperCase()}"</h2>
+                            <h2 className="font-fun text-3xl text-green-800">&apos;{currentEx.hece.toUpperCase()}&apos;</h2>
                             <p className="text-green-600 text-sm mt-1">
                                 İçinde <span className="font-bold underline">{currentEx.hece}</span> hecesi olan sinekleri yakala!
                             </p>
@@ -253,15 +253,7 @@ export default function HeceAviPage() {
                                         className="w-16 h-16 mb-2 flex items-center justify-center"
                                         aria-hidden="true"
                                     >
-                                        <svg 
-                                            viewBox="0 0 24 24" 
-                                            fill="none" 
-                                            stroke={fly.isCorrect ? "#16a34a" : "#2563eb"} 
-                                            strokeWidth="1.5" 
-                                            className="w-full h-full drop-shadow-lg"
-                                        >
-                                            <path d="M12 2v20M2 12h20"/>
-                                        </svg>
+                                        <span className="text-4xl drop-shadow-lg" aria-hidden="true">🪰</span>
                                     </motion.div>
                                     <span className="font-fun text-base text-gray-800 text-center">{fly.word}</span>
                                 </>

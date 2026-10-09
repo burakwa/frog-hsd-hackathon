@@ -119,15 +119,15 @@ export default function GirisPage() {
                                 <div>
                                     <label className="font-rounded text-sm text-gray-700 mb-2 block">Oyuncu Adı</label>
                                     <div className="relative">
-                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                                         <input
-                                            className="input pl-12"
+                                            className="input pl-10"
                                             type="text"
                                             placeholder="Örn: Ali veya Zeynep"
                                             value={childName}
                                             onChange={e => setChildName(e.target.value)}
                                             autoComplete="name"
                                         />
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
                                     </div>
                                 </div>
 
@@ -176,9 +176,8 @@ export default function GirisPage() {
                                 <div>
                                     <label className="font-rounded text-sm text-gray-700 mb-2 block">E-Posta</label>
                                     <div className="relative">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                                         <input
-                                            className="input pl-12"
+                                            className="input pl-10"
                                             type="email"
                                             placeholder="ornek@mail.com"
                                             value={email}
@@ -186,15 +185,15 @@ export default function GirisPage() {
                                             required
                                             autoComplete="email"
                                         />
+                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
                                     </div>
                                 </div>
 
                                 <div>
                                     <label className="font-rounded text-sm text-gray-700 mb-2 block">Şifre</label>
                                     <div className="relative">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                                         <input
-                                            className="input pl-12 pr-12"
+                                            className="input pl-10 pr-12"
                                             type={showPass ? 'text' : 'password'}
                                             placeholder="••••••••"
                                             value={password}
@@ -202,12 +201,13 @@ export default function GirisPage() {
                                             required
                                             autoComplete="current-password"
                                         />
+                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
                                         <button
                                             type="button"
                                             onClick={() => setShowPass(p => !p)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                         >
-                                            {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                            {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
                                     </div>
                                 </div>
@@ -251,7 +251,7 @@ export default function GirisPage() {
                 {/* Trust badges */}
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-400">
                     <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-green-500" />
+                        <Sparkles className="w-3 h-3 text-green-500" />
                         Güvenli
                     </span>
                     <span className="flex items-center gap-1">

@@ -27,7 +27,7 @@ export default function LandingPage() {
                 </div>
                 <nav className="hidden md:flex items-center gap-6">
                     <Link href="/giris" className="font-rounded text-gray-600 hover:text-green-600 transition-colors text-sm">Giriş</Link>
-                    <Link href="/kayit" className="btn btn-secondary btn-small">Kayıt Ol</Link>
+                    <Link href="/kayit" className="btn btn-primary btn-small">Kayıt Ol</Link>
                 </nav>
             </header>
 
@@ -127,7 +127,7 @@ export default function LandingPage() {
                             </button>
                         </Link>
                         <Link href="/kayit">
-                            <button className="btn btn-accent btn-large w-full sm:w-auto group">
+                            <button className="btn btn-primary btn-large w-full sm:w-auto group">
                                 <Sparkles className="w-5 h-5" />
                                 <span>Ücretsiz Kayıt Ol</span>
                             </button>

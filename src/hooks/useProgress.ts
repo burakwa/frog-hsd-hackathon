@@ -1,6 +1,6 @@
 // hooks/useProgress.ts
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { GameSession, Badge } from '@/types';
 import { useAuth } from './useAuth';
@@ -23,9 +23,14 @@ export function useProgress() {
     const [badges, setBadges] = useState<Badge[]>(INITIAL_BADGES);
     const [loading, setLoading] = useState(false);
     const supabase = createClient();
+    const isInitialMount = useRef(true);
 
     // Load from localStorage first (for instant UI)
     useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
         if (typeof window !== 'undefined') {
             const localStars = localStorage.getItem('frog_total_stars');
             if (localStars) {

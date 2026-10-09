@@ -244,7 +244,7 @@ export default function SesTekrariGame() {
                                 <span className="font-fun text-lg">Dinleniyor...</span>
                             </div>
                             <div className="font-mono text-lg text-gray-700 bg-gray-50 px-4 py-2 rounded-xl min-w-[200px]">
-                                "{spokenText || '...'}"
+                                {spokenText || '...'}
                             </div>
                         </motion.div>
                     ) : spokenText ? (
@@ -254,7 +254,7 @@ export default function SesTekrariGame() {
                                 <span className="font-fun text-lg">Duyuldu</span>
                             </div>
                             <div className="font-mono text-lg text-gray-700 bg-green-50 px-4 py-2 rounded-xl min-w-[200px]">
-                                "{spokenText}"
+                                {spokenText}
                             </div>
                         </div>
                     ) : (

@@ -1,6 +1,6 @@
 // components/game/Character.tsx — Fixed DiceBear API with Green Theme
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import type { MascotMood } from '@/types';
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
     avatar?: string; // DiceBear seed
     showLilypad?: boolean;
     style?: 'bottts' | 'shapes' | 'avataaars' | 'personas' | 'initials' | 'fun-emoji';
+    onClick?: () => void;
 }
 
 // Green color palette for DiceBear (hex without #)
@@ -45,22 +46,21 @@ export default function Character({
     avatar,
     showLilypad = false,
     style = 'bottts',
+    onClick,
 }: Props) {
     const [seed, setSeed] = useState<string>('frog-friend');
     const [useFallback, setUseFallback] = useState(false);
+    const isInitialMount = useRef(true);
 
-    // Load saved avatar seed
+    // Use avatar prop directly, fallback to localStorage, then default
     useEffect(() => {
-        if (avatar) {
-            setSeed(avatar);
-            setUseFallback(false);
-        } else if (typeof window !== 'undefined') {
-            const stored = localStorage.getItem('frog_player_avatar_seed');
-            if (stored) {
-                setSeed(stored);
-                setUseFallback(false);
-            }
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
         }
+        const newSeed = avatar || (typeof window !== 'undefined' ? localStorage.getItem('frog_player_avatar_seed') : null) || 'frog-friend';
+        setSeed(newSeed);
+        setUseFallback(false);
     }, [avatar]);
 
     // Build DiceBear URL - using correct API format
@@ -69,7 +69,6 @@ export default function Character({
         const params = new URLSearchParams({
             seed,
             size: String(size),
-            backgroundColor: 'dcfce7,bbf7d0,86efac', // Green backgrounds
         });
 
         // Style-specific parameters
@@ -77,18 +76,25 @@ export default function Character({
             params.set('eyes', 'happy,happy2,happy3');
             params.set('mouth', 'smile,laugh');
             params.set('colors', GREEN_PALETTE.join(','));
+            params.set('backgroundColor', 'dcfce7,bbf7d0,86efac');
         } else if (style === 'shapes') {
             params.set('color', GREEN_PALETTE.join(','));
+            params.set('backgroundColor', 'dcfce7,bbf7d0,86efac');
         } else if (style === 'avataaars') {
             params.set('skinColor', 'light,yellow');
-            params.set('hairColor', 'green,emerald');
-            params.set('eyes', 'happy,wink');
-            params.set('mouth', 'smile,tongue');
+            params.set('hairColor', 'green,emerald,brown');
+            params.set('eyes', 'default,happy,wink');
+            params.set('mouth', 'default,smile,tongue');
             params.set('accessories', 'none');
-            params.set('clothesColor', 'green,emerald,teal');
-        } else if (style === 'fun-emoji') {
-            params.set('eyes', 'happy,wink');
-            params.set('mouth', 'smile,tongue');
+            params.set('clothesColor', 'green,emerald,teal,blue');
+            params.set('backgroundColor', 'dcfce7,bbf7d0,86efac');
+        } else if (style === 'personas') {
+            params.set('skinColor', 'light,yellow');
+            params.set('hairColor', 'green,emerald');
+            params.set('eyes', 'default,happy,wink');
+            params.set('mouth', 'default,smile,tongue');
+            params.set('accessories', 'none');
+            params.set('backgroundColor', 'dcfce7,bbf7d0,86efac');
         }
 
         return `${baseUrl}/${style}/svg?${params.toString()}`;
@@ -97,12 +103,19 @@ export default function Character({
     const animClass = MOOD_CLASSES[mood] || 'animate-float-gentle';
     const frogSrc = FROG_IMAGES[mood as keyof typeof FROG_IMAGES] || FROG_IMAGES.happy;
 
+    const handleImageError = () => {
+        setUseFallback(true);
+    };
+
     return (
         <div
-            className={`select-none relative inline-flex flex-col items-center justify-center ${animClass}`}
+            className={`select-none relative inline-flex flex-col items-center justify-center ${animClass} ${onClick ? 'cursor-pointer' : ''}`}
             style={{ width: size, height: showLilypad ? size * 1.15 : size }}
             role="img"
             aria-label={`Karakter - ${mood}`}
+            onClick={onClick}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); } }}
+            tabIndex={onClick ? 0 : undefined}
         >
             {/* Avatar with fallback */}
             <div
@@ -116,7 +129,7 @@ export default function Character({
                         className="w-full h-full object-contain drop-shadow-lg"
                         style={{ filter: mood === 'sad' ? 'grayscale(0.5) brightness(0.8)' : 'none' }}
                         loading="lazy"
-                        onError={() => setUseFallback(true)}
+                        onError={handleImageError}
                     />
                 ) : (
                     <img
@@ -166,11 +179,18 @@ export function AvatarPicker({
     onSelect: (seed: string) => void;
     currentSeed?: string;
     size?: number;
-    style?: 'bottts' | 'shapes' | 'avataaars';
+    style?: 'bottts' | 'shapes' | 'avataaars' | 'personas';
 }) {
     const [seeds, setSeeds] = useState<string[]>([]);
+    const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+    const isInitialMount = useRef(true);
 
+    // Regenerate seeds when style or size changes
     useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
         const generateSeeds = () => {
             const adjectives = ['happy', 'green', 'jumpy', 'smart', 'kind', 'brave', 'calm', 'bright'];
             const nouns = ['frog', 'toad', 'leaf', 'pond', 'reed', 'lily', 'moss', 'fern'];
@@ -181,35 +201,99 @@ export function AvatarPicker({
             });
         };
         setSeeds(generateSeeds());
-    }, []);
+        setImageErrors(new Set());
+    }, [style, size]);
+
+    const handleImageError = (seed: string) => {
+        setImageErrors(prev => new Set(prev).add(seed));
+    };
+
+    const buildAvatarUrl = (seed: string) => {
+        const baseUrl = 'https://api.dicebear.com/9.x';
+        const params = new URLSearchParams({
+            seed,
+            size: String(size),
+        });
+
+        // Style-specific parameters - using correct DiceBear 9.x API
+        if (style === 'bottts') {
+            params.set('eyes', 'happy,happy2,happy3');
+            params.set('mouth', 'smile,laugh');
+            params.set('colors', '16a34a,15803d,22c55e,4ade80,86efac,14532d,166534');
+            params.set('backgroundColor', 'dcfce7,bbf7d0,86efac');
+        } else if (style === 'shapes') {
+            params.set('color', '16a34a,15803d,22c55e,4ade80,86efac,14532d,166534');
+            params.set('backgroundColor', 'dcfce7,bbf7d0,86efac');
+        } else if (style === 'avataaars') {
+            // avataaars needs specific parameters that work
+            params.set('skinColor', 'light,yellow');
+            params.set('hairColor', 'green,emerald,brown');
+            params.set('eyes', 'default,happy,wink');
+            params.set('mouth', 'default,smile,tongue');
+            params.set('accessories', 'none');
+            params.set('clothesColor', 'green,emerald,teal,blue');
+            params.set('backgroundColor', 'dcfce7,bbf7d0,86efac');
+        } else if (style === 'personas') {
+            // personas is a valid alternative to fun-emoji
+            params.set('skinColor', 'light,yellow');
+            params.set('hairColor', 'green,emerald');
+            params.set('eyes', 'default,happy,wink');
+            params.set('mouth', 'default,smile,tongue');
+            params.set('accessories', 'none');
+            params.set('backgroundColor', 'dcfce7,bbf7d0,86efac');
+        }
+
+        return `${baseUrl}/${style}/svg?${params.toString()}`;
+    };
 
     return (
-        <div className="grid grid-cols-4 gap-3" role="group" aria-label="Avatar seçenekleri">
-            {seeds.map((seed, i) => (
-                <button
-                    key={seed}
-                    onClick={() => onSelect(seed)}
-                    className={`relative p-2 rounded-xl border-3 transition-all ${
-                        currentSeed === seed
-                            ? 'border-green-500 bg-green-50 scale-105 shadow-lg ring-2 ring-green-200'
-                            : 'border-gray-200 bg-white hover:border-green-300 hover:shadow-md'
-                    }`}
-                    aria-label={`Avatar ${i + 1}`}
-                    aria-pressed={currentSeed === seed}
-                >
-                    <img
-                        src={`https://api.dicebear.com/9.x/${style}/svg?seed=${seed}&size=${size}&backgroundColor=dcfce7,bbf7d0,86efac&color=16a34a,15803d,22c55e,4ade80,86efac,14532d,166534`}
-                        alt={`Avatar ${i + 1}`}
-                        className="w-full h-full object-contain rounded-lg"
-                        loading="lazy"
-                    />
-                    {currentSeed === seed && (
-                        <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold">
-                            ✓
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3" role="group" aria-label="Avatar seçenekleri">
+            {seeds.map((seed, i) => {
+                const hasError = imageErrors.has(seed);
+                const isSelected = currentSeed === seed;
+                return (
+                    <button
+                        key={seed}
+                        onClick={() => !hasError && onSelect(seed)}
+                        disabled={hasError}
+                        className={`relative p-2 rounded-xl border-3 transition-all ${
+                            isSelected
+                                ? 'border-green-500 bg-green-50 scale-105 shadow-lg ring-2 ring-green-200'
+                                : hasError
+                                    ? 'border-red-200 bg-red-50 opacity-50 cursor-not-allowed'
+                                    : 'border-gray-200 bg-white hover:border-green-300 hover:shadow-md'
+                        }`}
+                        aria-label={`Avatar ${i + 1}${hasError ? ' (yükleme hatası)' : ''}`}
+                        aria-pressed={isSelected}
+                    >
+                        <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-50">
+                            {!hasError ? (
+                                <img
+                                    src={buildAvatarUrl(seed)}
+                                    alt={`Avatar ${i + 1}`}
+                                    className="w-full h-full object-contain"
+                                    loading="lazy"
+                                    onError={() => handleImageError(seed)}
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-3xl">
+                                    🐸
+                                </div>
+                            )}
+                            {isSelected && !hasError && (
+                                <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold">
+                                    ✓
+                                </div>
+                            )}
+                            {hasError && (
+                                <div className="absolute inset-0 bg-red-500/10 flex items-center justify-center">
+                                    <span className="text-xs text-red-500">⚠</span>
+                                </div>
+                            )}
                         </div>
-                    )}
-                </button>
-            ))}
+                    </button>
+                );
+            })}
         </div>
     );
 }
