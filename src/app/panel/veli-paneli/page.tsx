@@ -1,15 +1,20 @@
 // app/panel/veli-paneli/page.tsx — Parent/Therapist Report (Bright Design)
 'use client';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ShieldCheck, Printer, Star, FileText, Brain, AlertTriangle, Lightbulb, Download, TrendingUp, Target, Award } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShieldCheck, Printer, Star, FileText, Brain, AlertTriangle, Lightbulb, Download, TrendingUp, Target, Award, Sparkles, X, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProgress } from '@/hooks/useProgress';
 import Character from '@/components/game/Character';
+import { useAIAnalysis, useAIProgressReport } from '@/hooks/useAIAnalysis';
 
 export default function VeliPaneliPage() {
     const { user, profile } = useAuth();
     const { sessions, totalStars, badges } = useProgress();
+    const { analyze, analyzing: aiAnalyzing } = useAIAnalysis();
+    const { generate: generateAIReport, generating: aiGenerating, report: aiReport } = useAIProgressReport();
+
+    const [showAIReport, setShowAIReport] = useState(false);
 
     const articulationData = [
         {
@@ -100,13 +105,42 @@ export default function VeliPaneliPage() {
                     </h1>
                     <p className="text-gray-500 mt-1">Konuşma gelişimi detay analizi ve ev önerileri</p>
                 </div>
-                <button
-                    onClick={handlePrint}
-                    className="btn btn-secondary"
-                >
-                    <Printer className="w-4 h-4" />
-                    Yazdır / PDF
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={async () => {
+                            await generateAIReport({
+                                childName: displayName,
+                                totalStars,
+                                level: Math.floor(totalStars / 10) + 1,
+                                sessions,
+                                soundAccuracy: articulationData.map(a => ({ sound: a.sound, accuracy: a.accuracy, status: a.status })),
+                                badges: badges.map(b => ({ ad: b.ad, kazanildi: b.kazanildi }))
+                            });
+                            if (aiReport) setShowAIReport(true);
+                        }}
+                        disabled={aiGenerating}
+                        className="btn btn-accent"
+                    >
+                        {aiGenerating ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                Oluşturuluyor...
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="w-4 h-4 mr-2" />
+                                AI Raporu Oluştur
+                            </>
+                        )}
+                    </button>
+                    <button
+                        onClick={handlePrint}
+                        className="btn btn-secondary"
+                    >
+                        <Printer className="w-4 h-4" />
+                        Yazdır / PDF
+                    </button>
+                </div>
             </motion.div>
 
             {/* Child Summary Card */}
@@ -269,6 +303,62 @@ export default function VeliPaneliPage() {
                     ))}
                 </div>
             </motion.div>
+
+            {/* Print Footer Note */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="text-center text-sm text-gray-400 py-4 border-t border-gray-100"
+            >
+                <p>Bu rapor FrogFriends platformu tarafından otomatik oluşturulmuştur.</p>
+                <p className="mt-1">Yazdır butonu ile PDF olarak kaydedebilirsiniz.</p>
+            </motion.div>
+
+            {/* AI Report Modal */}
+            <AnimatePresence>
+                {showAIReport && aiReport && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
+                        onClick={() => setShowAIReport(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="card card-elevated p-6 md:p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="font-fun text-xl text-gray-800 flex items-center gap-2">
+                                    <Sparkles className="w-5 h-5 text-yellow-500" />
+                                    AI Gelişim Raporu
+                                </h2>
+                                <button
+                                    onClick={() => setShowAIReport(false)}
+                                    className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
+                                {aiReport}
+                            </div>
+                            <div className="mt-6 pt-4 border-t border-gray-100 flex justify-end">
+                                <button
+                                    onClick={() => setShowAIReport(false)}
+                                    className="btn btn-secondary"
+                                >
+                                    Kapat
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Print Footer Note */}
             <motion.div

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Volume2, Trophy, Sparkles, Mic } from 'lucide-react';
+import { ArrowLeft, Volume2, Trophy, Sparkles, Mic, AlertTriangle } from 'lucide-react';
 import PraiseOverlay from '@/components/game/PraiseOverlay';
 import MicrophoneButton from '@/components/speech/MicrophoneButton';
 import SpeechVisualizer from '@/components/speech/SpeechVisualizer';
@@ -16,6 +16,7 @@ import { analyze } from '@/lib/comparison/analyze';
 import { exercises } from '@/lib/data/exercises';
 import { randomPraise, randomEncouragement } from '@/lib/utils/praise';
 import { scoreToStars } from '@/lib/utils/helpers';
+import { useAIAnalysis } from '@/hooks/useAIAnalysis';
 import type { AnalysisResult, MascotMood } from '@/types';
 
 export default function SesTekrariGame() {
@@ -31,6 +32,7 @@ export default function SesTekrariGame() {
     const { transcript, finalTranscript, isListening, error, isSupported, start, stop, resetTranscript } = useSpeechRecognition();
     const { speak } = useSpeechSynthesis();
     const { addStars, recordSession } = useProgress();
+    const { analyze: analyzeWithAI, analyzing: aiAnalyzing } = useAIAnalysis();
 
     const ex = exercises[index % exercises.length];
 
@@ -68,6 +70,28 @@ export default function SesTekrariGame() {
         const s = scoreToStars(r.score);
         setStars(s);
 
+        // Enhanced AI Analysis for better feedback
+        if (s < 3) { // Only for non-perfect scores
+            analyzeWithAI({
+                targetWord: ex.metin,
+                spokenWord: spoken,
+                score: r.score,
+                errors: r.errors,
+                context: 'word',
+                childAge: 6
+            }).then(aiResult => {
+                if (aiResult) {
+                    // Use AI feedback for overlay message if score is low
+                    if (s < 2) {
+                        setOverlayMsg(aiResult.feedback);
+                    }
+                    // Could store aiResult for detailed feedback display
+                }
+            }).catch(() => {
+                // Silently fail, use local feedback
+            });
+        }
+
         if (s >= 2) {
             playChiptune(587, 'square', 0.15);
             setTimeout(() => playChiptune(880, 'triangle', 0.3), 100);
@@ -84,7 +108,7 @@ export default function SesTekrariGame() {
             setOverlayMsg(randomEncouragement());
             setMascotMood('sad');
         }
-    }, [isListening, finalTranscript, transcript, lastFinal, ex.metin, speak]);
+    }, [isListening, finalTranscript, transcript, lastFinal, ex.metin, speak, analyzeWithAI]);
 
     useEffect(() => {
         if (isListening) setMascotMood('speaking');
@@ -268,6 +292,62 @@ export default function SesTekrariGame() {
                             message={overlayMsg}
                             onRetry={reset}
                         />
+                    </motion.div>
+                )}
+
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-xl"
+                    >
+                        <div className="flex items-center gap-2 text-orange-700 mb-2">
+                            <AlertTriangle className="w-5 h-5" />
+                            <span className="font-fun text-sm">Ses tanıma çalışmıyor</span>
+                        </div>
+                        <p className="text-sm text-orange-600 mb-3">{error}</p>
+                        <p className="text-xs text-orange-500 mb-3">Aşağıdan doğru kelimeyi seçerek oynayabilirsiniz:</p>
+                    </motion.div>
+                )}
+
+                {/* Fallback: Manuel Kelime Seçimi */}
+                {(error || !isSupported) && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-6"
+                    >
+                        <p className="font-rounded text-sm text-gray-500 text-center mb-3">Ya da kelimeyi seç:</p>
+                        <div className="flex flex-wrap gap-2 justify-center">
+                            {ex.options?.map((opt, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => {
+                                        setMascotMood('thinking');
+                                        setTimeout(() => {
+                                            const r = analyze(ex.metin, opt);
+                                            setResult(r);
+                                            const s = scoreToStars(r.score);
+                                            setStars(s);
+                                            if (s >= 2) {
+                                                setOverlayMsg(randomPraise());
+                                                setMascotMood('excited');
+                                                addStars(s);
+                                                recordSession('ses-tekrari', r.score, s, 30);
+                                                setTimeout(() => speak(randomPraise()), 300);
+                                                setTimeout(() => setShowOverlay(true), 600);
+                                            } else {
+                                                setOverlayMsg(randomEncouragement());
+                                                setMascotMood('sad');
+                                            }
+                                        }, 300);
+                                    }}
+                                    className="btn btn-secondary text-sm"
+                                >
+                                    {opt.toUpperCase()}
+                                </button>
+                            ))}
+                        </div>
                     </motion.div>
                 )}
 
