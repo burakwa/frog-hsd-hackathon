@@ -7,7 +7,8 @@ export default function Test() {
     const recRef = useRef<any>(null);
 
     const start = () => {
-        const SR = window.speechRecognition || window.webkitSpeechRecognition;
+        const win = typeof window !== 'undefined' ? (window as any) : null;
+        const SR = win?.SpeechRecognition || win?.webkitSpeechRecognition;
         if (!SR) { alert('Bu tarayıcı desteklemiyor! Chrome/Edge kullan.'); return; }
 
         const rec = new SR();
