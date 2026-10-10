@@ -66,7 +66,7 @@ Eğlenceli bir kurbağa karakteriyle, çocukların konuşmayı öğrenmesini ve 
 
 ```bash
 # Repoyu klonlayın
-git clone https://github.com/kullanici/frog.git
+git clone https://github.com/burakwa/frog-hsd-hackathon
 cd frog
 
 # Bağımlılıkları yükleyin
@@ -206,9 +206,9 @@ MIT License — Detaylar için [LICENSE](LICENSE) dosyasına bakın.
 
 ## 📞 İletişim
 
-**Proje Sahibi:** [Burak](https://github.com/burak)  
+**Proje Sahibi:** [Burak](https://github.com/burakwa)  
 **Canlı Demo:** [https://frog-hsd-hackathon.vercel.app](https://frog-hsd-hackathon.vercel.app)  
-**Sorun Bildirimi:** [GitHub Issues](https://github.com/kullanici/frog/issues)
+**Sorun Bildirimi:** [GitHub Issues](https://github.com/burakwa/frog/issues)
 
 ---
 
